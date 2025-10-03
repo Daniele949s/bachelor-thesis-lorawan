@@ -2,17 +2,19 @@
 IoT (Internet delle cose) --> Rete molto grande di dispositivi fisici dotati di sensori, software e connettività di rete tramite i quali si scambiano dati. 
 			      Cioè gli smart objects (i dispositivi di cui si parlava prima) raccolgono e comunicano dati su loro stessi e visualizzano dati di altri.
 			      Quindi estensione di internet a oggetti e luoghi concreti.
-
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Sensori --> Rileva grandezze fisiche e le converte in segnali elettrici e non che possono essere comunicate ad un sistema e processate da esso
 
 Attuatori --> Converte segnali in azioni fisiche
 
-
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Chirp Spread Spectrum --> E' una tecnica di modulazione che utilizza dei segnali analogici la cui frequenza 
                           varia in modo continuo nel tempo (quindi una modulazione FM), chiamati chirp, per trasmettere dati.
                           Utilizza una banda più ampia rispetto a quella del segnale originale per ridurre i danni da 
                           eventuali interferenze o rumori.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 LoRa --> E' una tecnica di modulazione wireless derivante da CSS, è resistente ai disturbi (per la banda più larga(?)) ed 
          è perciò ottimale per trasmissioni a lunga distanza (soprattutto se la dimensione del payload non è molto grande).
@@ -51,7 +53,7 @@ LoRaWAN --> E' un protocollo presente al livello MAC (sottolivello del livello D
 	    	  
 	    	- Grande ecosistema di figure che si occupano dello sviluppo e della crescita di LoRaWAN
 	
-	
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	
 	
 	    		   
 Star network --> I dispositivi sono connessi ad un hub o ad uno switch centrale da cui passano tutti i dati	    		   
@@ -139,7 +141,56 @@ LoRaWAN Relay --> i relay sono utili in situazioni in cui gli end devices e i ga
 		 di 6 bytes. Il frame risultante si chiama Relay Uplink FRMPayload. Successivamente il relay crea un nuovo LoRaWAN frame inserendo il Relay Uplink
 		 FRMPayload nel suo payload. Questo frame viene poi mandato tramite gateways al Network Server 
 
- 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+
+Da lorawan-specification-v1.1: 
+I LoRaWAN networks solitamente risiedono in una stars-of-star topology dove i gateways trasmettono messaggi tra end-devices e un Network server centrale, il quale instrada i pacchetti ricevuti da ogni dispositivo all'Application Server associato. Per rendere sicure le trasmissioni LoRaWAN si appoggia alla crittografia simmetrica (una sola chiave) usando session keys derivanti dal device's root keys (chiavi master memorizzate sul dispositivo usate per derivare/le autenticare le chiavi operative). Nel backend lo storage di queste chiavi e le operazioni derivanti sono assicurate da un Join Server.
+!! Network Server, Application Server e Join Server sono co-located (si trovano nello stesso luogo fisico) !! : Dice solo "in questa specifica"
+
+La comunicazione tra End-Devices e Gateways è sparsa su più canali di frequenza e data rates (velocità con cui i dati vengono trasferiti in un sistema di comunicazione o memorizzazione.), questi ultimi sono selezionati in base al range di comunicazione e la durata del messaggio, comunicazioni con diveri data rates non interferiscono tra loro; i data rates di LoRa vanno da 0.3 kbps a 50 kbps. Per massimizzare sia la battery life degli end-devices sia la capacità totale del network LoRa è in grado di amministrare il data rate e l'RF output (uscita a radiofrequenza di un dispositivo elettronico, RF output è il segnale LoRa modulato inviato all’antenna?) individualmente grazie a un ADR (adaptive data rate) schema
+
+Gli End-Devices possono trasmettere in ogni canale disponibile in ogni moento, usando ogni data rate disponibile, finchè queste regole sono rispettate:
+- L'end device cambia canale in maniera pseudo-casuale per ogni trasmissione. La risultate diversita di frequenza fa si che il sistema sia più robusto alle interferenze
+- L'end device rispetta il massimo duty cicle di trasmissione (rapporto tra tempo in cui un segnale o un dispositivo è attivo e il tempo totale del ciclo) relativo alla sottobanda usata e ai regolamenti locali
+- L'end device rispetta la massima durata di trasmissione, chiamata anche dwell time, relativa alla sottobanda usata e ai regolamenti locali 
+
+
+TUTTI i LoRaWAN device devono implemetare almeno le funzionalità di classe A e in più dovrebbero/potrebbero implementare classe B e C.
+LoRa™ is a wireless modulation for long-range low-power low-data-rate applications developed by Semtech. Devices implementing more than Class A are generally named “higher Class end-devices” in this document.
+
+Classe A (end devices bi-direzionali): Gli end-devices devono permettere comunicazioni bi-direzionali dove ogni end-device uplink transmission è seguita da 2 corte downlink receive windows. L'operazione di classe A è l'end device a minor potenza per applicazioni che richiede solamente  una comunicazione downlink dal server poco dopo che l'end device ha mandato una trasmissione uplink, ogni altra trasmissione downlink dal server deve aspettare la prossima trasmissione uplink ( copio perchè poco chiara una parte: This Class A operation is the lowest power end-device system for applications that only require downlink communication from the server shortly after the end-device has sent an uplink transmission. Downlink communications from the server at any other time will have towait until the next scheduled uplink.)
+
+Classe B (end device bi-direzionali con scheduled receive slots): sono permessi più slot di ricezione. Oltre alla random receive windows della classe A sono aperte più receive windows a scheduled times. Affinche sia aperta una scheduled receive windows l'end device deve ricevere un time synchronized Beacon dal Gateway.
+
+Classe C (End device bi-direzionali con receive slots massimi): Questi end devices aprono continuamente receive windows, chiuse solo durante la trasmissione. Questi device utilizzano più energia rispetto a un device classe A o B ma offrono la minor latenza per una comunicazione da server a end device.
+
+ ... ... ... ... Appronfidre bene
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Certificare un end-device e test: 
+
+Per verificare che un end-device possa essere certificato viene effettuato un test di inter-operabilità tra end-device e network server. Il controllo consiste in più test che vanno a evidenziare se nell'esecuzione di questi il normale comportamento dei network elements viene alterato, portandoli a comportamenti "anomali" (This test plan describes specific test cases which can be executed without changing conditions which would cause any
+of the network elements to act in a way which is not normal in everyday operation.).
+Quindi l'obiettivo e accertarsi della compatibilità e di validare la funzionalità dell'end device (join the network, send uplink and recive downlink, maintain required communication parameters).
+
+
+Interoperability test setup:
+
+L'ambiente e il setup per il test comprende una configurazione strutturata che permette la valutazine delle capacità del device e della sua compatibilità col network. L'interoperability test si può condurre in un ambiente simile a una "Plug fest" (Un plugfest è un evento tecnico in cui diversi produttori o sviluppatori portano i propri dispositivi o software per testare l’interoperabilità tra implementazioni diverse di uno stesso standard.), quindi differenti elementi del network, End Devices, Gateways, Network servers, Join Servers e/o Application server sono connessi tra loro.
+
+Network server: Componente centrale per il processamento dei messaggi dagli End-Devices va configurato per la versione corretta.
+
+End-Devices: Possono essere sensori, attuatori o ogni altro tipo di IoT device designato per la comunicazione tramite LoRaWAN. L'End device da testare deve avere la stessa configurazione dei devices reperibili sul mercato
+
+Gateways: Serve come collegamento comunicativo tra gli End Devices e il Network Server
+
+Servono inoltre test per analizzare pacchetti, monitorare il network e catturare i log (usati per verificare se il comportamento del sistema è corretto). Esempi: Whireshark, TCPDump.
+
+Bisogna anche eseguire un setup dell'infrastruttura, posizionando per esempio il Gateway ad una distanza dalla quale copre adeguatamente gli End-Devices oppure accertandosi che il frequency plans sia permesso dal regolamento regionale.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 

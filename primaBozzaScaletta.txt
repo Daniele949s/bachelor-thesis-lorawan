@@ -1,0 +1,16 @@
+Di seguito gli argomenti da trattare in ordine:  (primissima bozza)
+
+1. Introduzione generale su IoT,LPWAN e LoRa
+2.IoT e LPWAN
+3 LoRa e LoRaWAN
+    3.1 CSS (introduzione e spiegazione)
+    3.2 Architettura (Struttura, end device e i vari tipi, funzionamento di questi)
+    3.3 Sicurezza ??
+    3.4 Applicazioni e vantaggi di LoRaWAN
+
+
+Questa è una primissima idea di struttura degli argomenti, da non interpretare come definitiva o non modificabile
+
+
+
+Possibili cose da mettere: Aspetti legali, confronti, sviluppi futuri 

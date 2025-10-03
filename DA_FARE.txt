@@ -1,0 +1,5 @@
+1. Guardare video su: https://resources.lora-alliance.org/     (sono abbastanza lunghi)
+2. Approfondire limitazioni regionali: https://resources.lora-alliance.org/technical-specifications/rp2-1-0-3-lorawan-regional-parameters
+3. Strutturare lo "scheletro" della tesi
+4. Documento utile su interface backend: https://resources.lora-alliance.org/home/ts002-1-1-0-lorawan-backend-interfaces
+5. Approfondire molto i dettagli dei device di classe A, B e C 
