@@ -3,3 +3,4 @@
 3. Strutturare lo "scheletro" della tesi
 4. Documento utile su interface backend: https://resources.lora-alliance.org/home/ts002-1-1-0-lorawan-backend-interfaces
 5. Approfondire molto i dettagli dei device di classe A, B e C 
+6. Approfondire molto concetto di IoT e LPWAN per introduzione
