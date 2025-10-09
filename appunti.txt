@@ -142,7 +142,8 @@ LoRaWAN Relay --> i relay sono utili in situazioni in cui gli end devices e i ga
 		 FRMPayload nel suo payload. Questo frame viene poi mandato tramite gateways al Network Server 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
+Uplink: End-Device - Gateway - Network Server
+Downlink: Network Server - Gateway - End-Device
 
 Da lorawan-specification-v1.1: 
 I LoRaWAN networks solitamente risiedono in una stars-of-star topology dove i gateways trasmettono messaggi tra end-devices e un Network server centrale, il quale instrada i pacchetti ricevuti da ogni dispositivo all'Application Server associato. Per rendere sicure le trasmissioni LoRaWAN si appoggia alla crittografia simmetrica (una sola chiave) usando session keys derivanti dal device's root keys (chiavi master memorizzate sul dispositivo usate per derivare/le autenticare le chiavi operative). Nel backend lo storage di queste chiavi e le operazioni derivanti sono assicurate da un Join Server.
@@ -211,7 +212,45 @@ Join-req, Rejoin-req e join-acceot sono usati per l'attivazione over-the-air (ve
 
 I data messages sono usati per comunicare sia comandi MAC sia application data ed è possibile combinare entrambi in un unico messaggio. Un confirmed-data message deve essere riconosciuto dal ricevente mentre un uncofirmed-data message non deve. Un Proprietary message può essere usato per implementare formati non starnadr di messaggi che non sono interoperabili con messaggi standard ma devono solo essere usati tra disposiivi che hanno una comune comprensione della proprietary extension; se un end-device o un Network Server riceve un messaggio proprietario sconosciuto lo deve scartare. 
 
-L'integrità de messaggi è assicurata in diversi modi in base al tipo di messaggio:
+L'integrità de messaggi è assicurata in diversi modi in base al tipo di messaggio (se ho ben capito)
+
+Major bit field: 
+00 LoRaWAN R1
+01..11 RFU
+Specifica il formato dei messaggi scambiati nella procedura di join e i primi 4 bytes del payload MAC. Per ogni major version gli end-devices posono implementare differenti minor versions del frame format. La minor versions usata dall'end-devices deve prima essere fatta conoscere al Network Server, questo non avviene via radio tramite pacchetti LoRaWAN, ma con altri mezzi, ad esempio tramite configurazione manuale nel server o tramite un sistema di gestione del dispositivo (Device Management). Se un device o un Network Server ricevono un frame che porta una verione sconosciuta o non supportata di LoRaWAN lo scartano
+
+FHDR e ADR:
+Il MACPayload è diviso in: FHDR - FPort - FRMPayload (FPort e FRMPayload sono optional).
+L'FHDR contiene l'indirizzo device corto dell'end-device (DevAddr), 1 byte di frame control (FCtrl), 2 byte di frame counter (FCnt) e fino a 15 byte di frame option (FOpts) usati per trasportare MAC commands. Se presente Fopts va criptato usando NwkSEncKey.
+FCtrl può avere 7 - 6 - 5 - 4 - 3..0 bits e corrispondono a 
+ADR - RFU - ACK - FPending - FOptsLen  in un frame downlink
+ADR - ADRACKReq - ACK - ClassB - FOptsLen in un frame uplink
+
+I network LoRa permettono agli end-devices di usare ogni possibile data rate e Tx power (Potenza totale emessa dal trasmettitore, quantità totake di potenza emessa). Lo scopo di ciò è adattare e ottimizzare data rate e Tx power di end-devices statici. Questo si chiama ADR (Adaptive Data Rate) e quando è attivato il network sarà ottimizzato per usare il data rate più veloce possibile. L'ADR potrebbe non essere possibile quando il canale radio cambia costantemente in maniera veloce nel tempo; quando questo succede il controllo del data rate passa dal Network Server all'application layer dell'end-device, e quest'ultimo dovrà cercare di variare lo SF (Spreading Factor) minimizzando il tempo totale di air occupation.
+
+Se il bit ADR è settato (1) il network controllerà data rate e Tx power tramite MAC commands. Se l'ADR non è settato il network non proverà a controllare il data rate ne il Tx power. Il network potrebbe comunque mandare comandi per cambiare la Channel mask o i parametri di ripetizione frame. L'ADR settato inoltre informa l'end-device che il Network Server è in posizione di mandare ADR commands, il device può settare/unsettare l'ADR bit.
+
+Se il bit ADR non è settato l'end-device "capisce" che per colpa di rapidi cambiamenti del canale radio il network temporaneamente non può stimare il miglior data rate. In questo caso l'end-device può o unsettare ADR uplink bit e controllare il data rate uplink basandosi su se stesso (strategia tipica di un end-device mobile) oppure può ignorare il fatto e tenere il bit settato aplicando un data rate decay  in assenza di ADR downlink commands (strategia tipica di end-device statici).
+
+Il bit ADR può essere settato/unsettato a comando dall'end-device o dal Network Server; tuttavia, quando possibile, l'ADR scheme dovrebe essere attivato per aumentare la battery life dell'end-device e massimizzare la capacità del network
+Nota: Even mobile end-devices are actually immobile most of the time. So depending on its state of mobility, an end-device can request the network to optimize its data rate using the ADR uplink bit.
+
+Di default la Tx power è la massima potenza di trasmissione permessa er il device considerandone le capacità e le limitazioni regionali. Il device deve usare questo livello di potenza fintanto che il network chiede di fare meno tramite il comando LinkADReq. 
+
+Se il network fa usare un data rate maggiore di quello di default a un certo end-device, o un Tx power minore di quello di default, periodicamente l'end-device deve confermare che il network riceva ancora frame uplink. Ogni volta che il frame uplink counter incrementa (solo per ogni uplink, trasmissioni ripetute non contano) il device incrementa ADR_ACK_CNT counter. Dopo il limite ADR_ACK_LIMIT senza alcuna risposta downlink, l'end device (credo) setta ADRACKReq (bit di richiesta ack). Il Network Server deve quindi rispondere con un frame downlink entro i ADR_ACK_DELAY frames, se viene ricevuto un frame downlink ADR_ACK_CNT si resetta. 
+
+Il bit ACK di downlink non deve essere settato se c'è una qualsiasi risposta durante il receive slot dell'end-device che indichi che il gateway ha ricevuto uplinks da questo dispositivo.
+
+Se nessuna risposta arriva entro i prox ADR_ACK_DELAY uplinks l'end-device deve provare a riconnettersi aumentando la Tx power al default se possibile e diminuendo il data rate al minore più vicino che fornisca un range radio più grande (next lower data rate that provides a longer radio range.) L'End-device deve diminuire ulteriormete il data rate step-by-step ogni volta che si raggiunge l'ADR_ACK_DELAY. Una volta che il device ha raggiunto il minor data rate possibile deve riattivare tutti i canali di frequenza uplink di default.
+
+L'ADRACKReq non deve essere settata se il device usa i suoi dr e Tx di default perchè non si possono intraprendere azioni che aumentino il link range.
+Fare esempio con fig. 14
+
+
+Quando si riceve un confirmed data message, il ricevente deve rispondere con un data frame con il bit di ACK settato. Se il mandante è un end-device il network proverà a mandare un ack usando una delle RX aperte dal device dopo l'operazione di invio. Se il mandante è un gateway l'end-device trasmette un ack a sua discrezione.
+
+La ritrasmissione avviene in questo modo: 
+Downlink frames: un downlink confirmed o unconfirmed non deve essere ritrasmesso usando lo stesso frame counter value. Se è un confirmed downlink, se l'ack non è stato ricevuto, l'application server viene notificato e potrebbe decidere di ritrasmettere un nuovo confirmed frame.
 
 
 
