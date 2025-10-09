@@ -164,8 +164,57 @@ Classe A (end devices bi-direzionali): Gli end-devices devono permettere comunic
 Classe B (end device bi-direzionali con scheduled receive slots): sono permessi più slot di ricezione. Oltre alla random receive windows della classe A sono aperte più receive windows a scheduled times. Affinche sia aperta una scheduled receive windows l'end device deve ricevere un time synchronized Beacon dal Gateway.
 
 Classe C (End device bi-direzionali con receive slots massimi): Questi end devices aprono continuamente receive windows, chiuse solo durante la trasmissione. Questi device utilizzano più energia rispetto a un device classe A o B ma offrono la minor latenza per una comunicazione da server a end device.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
- ... ... ... ... Appronfidre bene
+Classe A:
+
+Formati messaggi fisici: 
+i messaggi up-link vengono mandati da End-Devices al network server trasmessi da 1 o più gateways. Questi messaggi usano il LoRa radio packet explicit mode (nella explicit mode l'header è presente, nella implicit no) , nel quale il physical header LoRa (PHDR) + un header CRC (PHDR_CRC) sono inclusi. 
+Il pacchetto sarà quindi: preamble - PHDR - PHDR_CRC - PHYPayload - CRC
+I messaggi downlink sono mandati dal network server a un solo end device ed è trasmesso da un solo gateway. Questi messaggi usano la radio packet explicit mode nella quale il PHDR e il PHDR_CRC sono inclusi.
+Il pacchetto sarà quindi: Preamble - PHDR - PHDR_CRC - PHYPayload
+
+Receive windows: Alla fine di ogni trasmissione uplink l'end device deve aprire 2 brevi receive windows. La prima, che chiameremo RX1, utilizza una frequenza che è una funzione della frequenza uplink e un data rate che è una funzione del data rate usato nell'uplink; quindi freq e DR dipendono da quelli uplink.
+RX1 apre quindi dopo un ritardo RECEIVE_DELAY1 (di cui si parlerà dopo) secondi con una certa tolleranza (+/- 20 microsecondi) dopo la fine della modulazione uplink. La relazione tra uplink e RX1 slot downlink data rate è region specific e descritta in [PHY] ??. Di default il datarate di RX1 è identico al DR dell'ultimo uplnk.
+
+RX2 usa una frequenza e un data rate fissi configurabili, apre dopo un ritardo RECEIVE_DELAY2 dopo la fine della uplink modulation. Data rate e frequenza possono essere modificato da comandi MAC, di default seguono le regole regionali.
+
+La durata di una receive windows deve essere almeno del tmepo richiesto dal trasmettitore radio dell'end device per rilevare efficacemente un downlink preamble.
+
+Se un preamble è rilevato durante una delle receive windows, il ricevitore radio rimane attivo finchè il downlink frame non è stato demodulato. Se un frame è stato rilevato e demodulato durante RX1 e il frame era destinato a questo end-device, dopo i checks di address e MIC (message integrity code) l'end-device non deve aprire RX2.
+
+Se il network intende trasmettere downlink ad un end-device, deve iniziare la trasmissione precisamente all'inizio di almeno una delle due receive windows, se un downlink viene trasmesso durante entrambe le finestre i frame identici devono essere trasmessi durante ogni finestra.
+
+Un end device non deve trasmettere un ulteriore messaggio uplink prima che o abbia ricevuto un messaggio downlink in una delle due receive windows della precedente trasmissione, o la RX2 della precedente trasmissione sia già scaduta
+
+Il node può ascoltare o trasmettere altri protocolli o fare qualsiasi transazione(?) radio nel tempo tra la trasmissione LoRaWAN e la reception windows fintanto che l'end-device rimane compatibile con i regolamenti locali e soddisfi le specifiche LoRaWAN
+
+
+
+Formati messaggi MAC:
+Tutti i messaggi uplink e downlink hanno un PHYPayload che è formato in questo modo: MHDR (MAC Header, 1 byte) - MACPayload (7..M bytes m è region specific) o Join/Re_Join request o Join_Accept - MIC (Message Integrity Code, 4 byte)
+Il MHDR è diviso in: MType (7..5 bits, specifica il messaggio) - RFU (4..2 bits) - Major (1..0 versione nel quale il formato è stato codificato)
+A sua volta il MACPayload si divide in: FHDR - FPort - FRMPayload
+A sua volta l'FHDR si divide in: DevAddr - FCtrl - FCnt - FOpts
+
+I tipi di messaggio MAC in LoRaWAN sono 8 e sono:
+000 Join-request
+001 Join-Accept
+010 Uncofirmed Data Up
+011 Unconfirmed Data Down
+100 Confirmed Data Up
+101 Confirmed Data Down
+110 Rejoin-request
+111 Proprietary
+
+Join-req, Rejoin-req e join-acceot sono usati per l'attivazione over-the-air (vedere dopo)
+
+I data messages sono usati per comunicare sia comandi MAC sia application data ed è possibile combinare entrambi in un unico messaggio. Un confirmed-data message deve essere riconosciuto dal ricevente mentre un uncofirmed-data message non deve. Un Proprietary message può essere usato per implementare formati non starnadr di messaggi che non sono interoperabili con messaggi standard ma devono solo essere usati tra disposiivi che hanno una comune comprensione della proprietary extension; se un end-device o un Network Server riceve un messaggio proprietario sconosciuto lo deve scartare. 
+
+L'integrità de messaggi è assicurata in diversi modi in base al tipo di messaggio:
+
+
+
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
