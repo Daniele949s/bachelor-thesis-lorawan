@@ -252,6 +252,75 @@ Quando si riceve un confirmed data message, il ricevente deve rispondere con un 
 La ritrasmissione avviene in questo modo: 
 Downlink frames: un downlink confirmed o unconfirmed non deve essere ritrasmesso usando lo stesso frame counter value. Se è un confirmed downlink, se l'ack non è stato ricevuto, l'application server viene notificato e potrebbe decidere di ritrasmettere un nuovo confirmed frame.
 
+Uplink frames: i frame uplink confirmed e unconfirmed sono trasmessi NbTrans volte, tranne se un downlink valido viene ricevuto dopo una trasmissione. NbTrans può essere usato dal network manager per controllare la redundancy del nodo uplink per ottenere una certa QoS. L'end device deve fare la frequency hopping come sempre tra le trasmissioni ripetute e deve aspettare dopo ogni ripetizione finchè non conferma che RX1 e RX2 sono scadute. Il ritardo tra le ritrasmissioni è a discrezione dell'end device e può essere diverso tra ogni end-device. 
+
+Il device deve fermare ogni ulteriore ritrasmissione di un uplink confirmed frame se un corrispondente ack downlink frame arriva
+-Class B&C devices SHALL stop any further retransmission of an uplink “unconfirmed” frame whenever a valid unicast downlink message is received during the RX1 slot window.
+-Class A devices SHALL stop any further retransmission of an uplink “unconfirmed” frame whenever a valid downlink message is received during the RX1 or the RX2 slot window.
+
+Se il network riceve più di NbTrans trasmissioni dello stesso frameuplink, questo potrebbe indicare un replay attack o un device malfunzionante, quindi i frame extra nn vanno processati.
+
+Ricordiamo i bit di FCtrl (downlink): ADR - RFU - ACK - FPending - FOptsLen
+Fpending è usato solamente nelle comunicazioni downlink, indica che il network ha più data in attesa di essere andata e quindi chiede all'end-device di aprire un'altra RX asap mandando un altro messaggio uplink.
+
+Ogni end-device ha più frame counters per tenere traggia del numero di data frames mandati uplink al Network Server (FCntUp) e downlink dal Network Server (FCntDown).
+Nel downlink ci sono due diversi counter scheme, in uno tutte le porte condividono lo stesso FCntDown quando il device opera come un LoRaWAN 1.0 device, nell'altro ci sono 2 counter:  un NFCntDown è usato per le MAC communication sulla porta 0 e se FPort è assente; mentre un AFCntDown per tutte le altre porte in cui il device opera come LoRaWAN 1.1 device. NFCntDown è gestito dall'Network Server. AFCntDown dall'application server.
+
+Quando un OTAA device (Over the air activation) elabora con successo un messaggio di Join-accept, i frame counters dell'end-device e del network per quell'end-debice sono azzerati
+I device ABP (Activazion by personalization) invece hanno i frame counters inizializzati a 0 alla costruzione. Dopodichè non devono mai essere resettati durante il device's life time. Se l'end-device è a rischi di perdere potenza durante la sua life time i frame counters devono resistere a questo evento.
+
+FCntUp incrementa con ogni uplink
+NFCntDown con ogni downlink su FPort 0 o quando FPort non c'è.
+AFCntDown incrementa con ogni downlink in porte differenti da 0
+Nella parte ricevente il counter corrispondente è in sync con il valore ricevuto, questo viene fatto tramite confronto con i valore ricevuto e con il MIC del messaggio. FCnt non aumenta nel caso di trasmissioni multiple di un confirmed o unconfirmed frame. Il Network Server deve scartare l'application payload dei frame ritrasmessi e inviarne una singola istanza all'application server.
+
+I frame counters sono di 32 bits, in particolare FCnt solo i 16 bits meno significativi.
+
+Un end-devices non dovrebbe mai riutilizzare lo stesso FCntUp con lo stesso application o network session keys, tranne per la ritrasmissione dello stesso confirmed o unconfirmed frame. Inoltre non dovrebbe oricessare alcuna ritrasmissione dello stesso frame downlink ma ingnorarle.
+
+
+FOptsLen nel byte FCtrl denota la lunghezza di FOpts, questo trasporta MAC Commands di una lunghezza max di 15 byte. Se FOptsLen è 0 non c'è FOpts, altrimenti sono presenti MAC commands e FPort non può avere la porta 0. 
+
+MAC commands non possono essere presenti simultaneamente nel payload e in FOpts, se succede va ignorato il frame. 
+
+FOpts se presente va criptato prima del calcolo del MIC
+
+
+FPort deve essere presente se il payload è presente. Se c'è FPort il valore 0 indica che FRMPayload ha solo MAC commands e ogni frame con questa FPort deve essere processato dall'implementazione LoRaWAN. FPort da 1 a 223 sono application-specific e ogni frame con questi valori deve essere reso disponibile all'application layer dall'implementazione LoRaWAN. Il valore 224 invece serve per il LoRaWAN MAC layer test protocol. LoRaWAN implementation deve scartare tutte le richieste di trasmissione dall'application layer con FPort non in 1..224. 225..255 sono riservati a future estensioni dell'application.
+
+
+FRMPayload va criptato prima che il MIC venga calcolato
+
+Il MIC viene calcolato in base a tutti i campi del messaggio
+!!! Non mostro ne come viene calcolato ne come vengono criptati i campi da criptare !!!
+
+
+
+
+
+
+MAC COMMANDS
+Possono essere scambiati esclusivamente tra Network Server e MAC layer dell'end-device, non sono mai visibili all'application o all'application server o all'aplication che runna sull'end-device.
+
+Un singolo data frame può contenere qualsiasi sequenza di MAC commands, o trasportati da FOpts o nel FRMPayload con FPort settato a 0. Un MAC command cosiste in un Command Identifier (CID) di 1 byte seguito da una sequenza di byte che rappresenta il comando.
+
+I MAC commands sono answered/acknowleged dal ricevente nello stesso ordine della loro trasmissione. La risposta viene aggiunta sequenzialmente a un buffer.
+Tutti i MAC commands ricevuti in un frame devono essere risposti in un singolo frame, quindi il buffer con la risposta deve essre in un singolo frame. Se il buffer è più grande della lunghezza max di FOpt, il dispositivo deve mandare il buffer come FRMPayload sulla porta 0; se ha sia un application payload che un MAC answer da mandare e non entrano nello stesso frame la MAC answer ha la priorità.
+
+Se la lunghezza del buffer è più grande del max size di FRMPayload il dispositivo deve "CLIP" (?) alla max FRMPayload size prima di assemblare il frame, quindi può accadere che le ultime MAC answers vengano troncate. In ogni caso comunque la lista completa dei MAC commands va eseguita.
+Il Network Server non dovrebbe generare una sequenza di MAC commands a cui il device non possa rispondere in un singolo uplink, deve elaborare la massima disponibilità del FRMPayload così:
+-If the latest uplink ADR bit is 0: The max payload size corresponding to the lowest data rate MUST be considered
+-If the latest uplink ADR bit is set to 1: The max payload size corresponding to the data rate used for the last uplink of the device MUST be considered
+
+
+MEGA IMMAGINE DEI COMANDI con spiegazioni ---> decidere cosa fare. ( ovviamente mettere immagine, decidere se approfondire comando per comando o qualche comando o niente ) ora come ora forse sarebbe bene dare una veloce spiegazione a ogni comando e approfondire quelli più importanti.
+
+
+
+End-Device Activation:
+Per partecipare ad un LoRaWAN Network
+
+
 
 
 
