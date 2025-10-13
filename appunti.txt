@@ -318,7 +318,18 @@ MEGA IMMAGINE DEI COMANDI con spiegazioni ---> decidere cosa fare. ( ovviamente 
 
 
 End-Device Activation:
-Per partecipare ad un LoRaWAN Network
+Per partecipare ad un LoRaWAN Network ogni end-device deve essere personalizzato e attivato. L'attivazione avviene o Over The Air (OTAA) o via Activation By Personalization (ABP).
+
+JoinEUI è un global application ID nell' IEEE EUI64 address space che identifica unicamente il Join Server che è in grado di assistere la procedura di join e la session key derivation. Per gli OTAA devices il JoinEUI deve essere conservato nell'end-devices prima che la join procedure sia eseguita, per gli ABP only non è invece richiesto il JoinEUI
+
+DevEUI è un id globale dell'end device nell'IEE EUI64 address space che identifica unicamente l'end device. DevEUI è l'id identificatovo raccomandato dal Network server in qualsiasi activation procedure. Nei device OTAA DevEUI deve essere conservato nell'end-device prima della Join procedure mentre nei device ABP non è obbligatorio ma raccomandato.
+
+Device root keys:
+NwkKey e AppKey sono AES-128 root keys (chiavi pre-shared utilizzate per derivare tutte le session keys) specifice per l'end-device che sono assegnate a questo durante la costruzione. Ogni volta che un end-device joina via OTAA la NwkKey si usa per derivare FNwkSIntKey , SNwkSIntKey and NwkSEncKey session keys, mentre AppKey per derivare AppSKey session key. 
+
+In un Network Server versione 1.1 l'application session key è derivata solamente dall'AppKey, quindi la NwkKey potrebbe essere surrended all'network operator per amministrare la Join procedure senza enabling the operator to eavesdrop on the application payload data.(?)
+
+Per assicurare retro-compatibilità cn LoRaWAN 1.0 e versioni precedenti che non supportano due root keys
 
 
 
