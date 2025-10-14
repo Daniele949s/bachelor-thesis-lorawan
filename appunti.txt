@@ -329,11 +329,102 @@ NwkKey e AppKey sono AES-128 root keys (chiavi pre-shared utilizzate per derivar
 
 In un Network Server versione 1.1 l'application session key è derivata solamente dall'AppKey, quindi la NwkKey potrebbe essere surrended all'network operator per amministrare la Join procedure senza enabling the operator to eavesdrop on the application payload data.(?)
 
-Per assicurare retro-compatibilità cn LoRaWAN 1.0 e versioni precedenti che non supportano due root keys
+Per assicurare retro-compatibilità cn LoRaWAN 1.0 e versioni precedenti che non supportano due root keys, l'end-device quando entra in un network simile deve usare il single root key scheme. Viene usata solo la root NwkKey in questi casi. Questa condizione è segnalata agli end-device tramite l'OptNeg bit = 0 del DLsetting field nel Join-accept message. Quindi in questi casi l'end-device usa solo la NwkKey per derivare la AppSKey e la FNwkSIntKey, inoltre deve settare la SNwkSIntKey e la NwkSEncKey uguali alla FNwkSIntKey.
+
+A NwkKey MUST be stored on an end-device intending to use the OTAA procedure.
+A NwkKey is not required for ABP only end-devices.
+An AppKey MUST be stored on an end-device intending to use the OTAA procedure.
+An Appkey is not required for ABP only end-devices.
+Both the NwkKey and AppKey SHOULD be stored in a way that prevents extraction and re-use by malicious actors.
+
+
+Per i dispositivi OTA ci sono 2 lifetime keys derivate dalla NwkKey root key: 
+-JSIntKey usata per fare MIC Rejoin-Request type 1 messages e Join-Accept answers
+-JSEncKey usata per criptare la Join-Accept triggerata da una Rejoin-Request
 
 
 
+Dopo l'attivazione nell'end device si conservano il device address (DevAddr), 3 network session keys (NwkSEncKey, SNwkSIntKey, FNwkSIntKey) e un application session key.
 
+DevAddr consiste in 32 bits è identifica l'end-device nel network corrente, è allocato dal Network Server nell'end-device  !!IMMAGINE!!	
+!! SPIEGAZIONE IMMAGINE !!
+
+La FNwkSIntKey è una network session key specifica per l'end device, è usata da questo per calcolare il MIC o parte del MIC di tutti gli uplink data messages per assicurare la data integrity (vedi 4.4).
+
+la SNwkSIntKey è una network session key specifica per l'end device usata da questo per verificare il MIC di tutti gli downlink data messages per assicurare data integrity e elaborare meta dei uplink messages MIC. Se siamo in un ambiente LoRaWAN1.0 SNwkSIntKey e FNwkSIntKey hanno lo stesso valore.
+
+La NwkSEncKey è una network session key specifica per l'end-device usata da questo per criptare e decriptare uplik e downlink MAC comman trasmessi tramite payload nella porta 0 o trasmessi in FOpt. In LoRaWAN1.0 ha lo stesso valore di FNwkSIntKey
+
+La AppSKey è una application session key specifica per l'end devic usata sia da questo sia dall'application server per criptare e decriptare il campo payload dei messaggi application-specific. Gli application payloads sono criptati end-to-end tra end device e applictaion server, la loro integrity è protetta in una maniera hop-to-hop(?): un hop tra end-device e Network server e un hop tra Network Server e Application Server. A causa di ciò un Network Server malevolo potrebbe essere in grado di alterare il contenuto del data message in transnito, cosa che potrebbe anche far si che emerganp dettagli sul contenuto del messaggio
+
+
+Il Contesto di Sessione contiene Network Session e Application Session:
+The Network Session consists of the following state:
+F/SNwkSIntKey
+NwkSEncKey
+FCntUp
+FCntDwn (LW 1.0) or NFCntDwn (LW 1.1)
+DevAddr
+The Application Session consists of the following state:
+AppSKey
+FCntUp
+FCntDown (LW 1.0) or AFCntDwn (LW 1.1)
+Network Session state is maintained by the NS and the end-device. Application Session state is maintained by the AS and the end-device.
+
+Dopo il completamento di una procedura OTAA o ABP, un nuovo security session context è stato stabilito tra NS/AS e l'end-device. Chiavi e indirizzi dell'end-device sono fissati per la durata della sessione e i counters incrementano col traffico.
+
+
+OVER THE AIR ACTIVATION:
+Gli end-devices devono seguire una join procedure prima di scambiare dati col Network Server, se un end-device perde il contesto di sessione deve rifare la join procedure. I requisiti per iniziare la procedura sono che l'end-device abbia: DevEUI, JoinEUI, NwkKey e AppKey
+
+La procedura consiste dal punto di vista di un end-device in: Join o Rejoin-request e Join-accept
+Nel join-request si manda un messaggio contenente JoinEUI, DevEUI e DevNonce.
+DevNonce è un counter che parte da 0 e incrementa con ogni join request e si resetta quando il device si accende. Se l'end device può essere power-cycled va reso persistente e DevNonce non deve mai essere riusato per un dato JoinEUI.
+
+La join-accept è la risposta del server di conferma, è mandata come un normale downlink ma usa i delay JOIN_ACCEPT_DELAY1 o JOIN_ACCEPT_DELAY2 al posto di RECEIVE_DELAY1/2. La frequenza del canale e il data rate usati per queste due receive windows sono uguali a quelli usati per RX1 e RX2 descritti in precedenza.
+
+Se l'operazione va male non si inviano risposte.
+
+La join-accept contient una server nonce JoinNonce, un newtork identifier NetID, un end-device addres DevAddr, un DLSetting che provvede alcuni parametri downlink, il delay tra TX e RX RxDelay e una lista opzionale di network parameters CFList del network che l'end-device sta joinando
+
+Il JoinNonce è un counter dato dal JoinServer usato dall'end-device per derivare FNwkSIntKey, SNwkSIntKey, NwkSEncKey e AppSKey. Incrementa con ogni join-accept message. 
+!! roba che non ho scritto decidere poi !!
+
+
+NetID è un network identifier di 24 bits, alcuni di questi id sono riservati per network privati/sperimentali
+
+Il DLsettings contiene la configurazione downlink : OptNeg, RX1DRoffset, RX2 Data Rate
+OptNeg indica il protocollo LoRaWAN da implementare
+
+JoinReqType è un campo da 1 byte che codifica la tipologia di Join-request o Rejoin-request
+
+!! un pò di romba che non sto scrivendo !!
+
+Il ritardo RxDelay segue le stesse convenzioi del Delay nel RXTimingSetupReq command.
+
+
+ReJoin-request
+Una volta attivato un device deve ogni tanto trasmettere una Rejoin-request che periodicamente da al backend la possibilità di inizializzare un nuovo session context per l'end-device. Il Network Server risponde con un Join-Accept. Il Network Server può usare le Rejoin-request RX1 e RX2 windows er trasmettere confirmed o unconfirmed downlink frame con anche in caso MAC commands. Questo serve per resettare i parametri di ricezione del device in caso ci sia un MAC layer de-sync state tra il device e il Network Server.
+
+Ci sono 3 tipi di rejoin-request:
+!!IMMAGINE!! + spiegare i 3 tipi
+
+
+Activation By Personalzation
+Lega direttamente un end-device ad un Network Server senza la Join Procedure. In questo caso DevAddr e le 4 session keys sono conservate direttamente nell'end-device senza essere derivate da DevEUI, JoinEUI, AppKey e NwkKey durante la join procedure. L'end-device ha tutte le informazioni richieste per partecipare ad uno specifico LoRa network appena viene acceso. 
+
+Quando un dispositivo accede in questo modo alla rete per la prima volta o dopo una re-inizializzazione deve trasmettere il ResetInd MAC command nel FOpt di tutti i mess uplink finchè non riceve un ResetConf command dal network. Dopo una re-inizializzazione il device deve usare la sua configurazione di defualt.
+
+
+
+Retransmission back-off:
+I frame uplink che:
+-richiedono un ack o una risposta dal network o dall'app server, e sono ritrasmessi dal device se l'ack o la risposta non vengono ricevute
+- Possono essere triggerati da un evento esterno causando sync attorno a un grande numero di device 
+Possono triggerare una persistente, catastrofica situazione di overload del radio network.
+
+Per la ritrasmissione di questi frame l'intervallo tra la fine del RX2 slot e la prox uplink retransimssion deve essere random e seguire diverse sequenze per ogni dispositivo.
+!! IMMAGINE !!
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
