@@ -1,0 +1,141 @@
+IoT (Internet delle cose) --> Rete molto grande di dispositivi fisici dotati di sensori, software e connettività di rete tramite i quali si scambiano dati. 
+			      Cioè gli smart objects (i dispositivi di cui si parlava prima) raccolgono e comunicano dati su loro stessi e visualizzano dati di altri.
+			      Quindi estensione di internet a oggetti e luoghi concreti.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Sensori --> Rileva grandezze fisiche e le converte in segnali elettrici e non che possono essere comunicate ad un sistema e processate da esso
+
+Attuatori --> Converte segnali in azioni fisiche
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Chirp Spread Spectrum --> E' una tecnica di modulazione che utilizza dei segnali analogici la cui frequenza 
+                          varia in modo continuo nel tempo (quindi una modulazione FM), chiamati chirp, per trasmettere dati.
+                          Utilizza una banda più ampia rispetto a quella del segnale originale per ridurre i danni da 
+                          eventuali interferenze o rumori.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LoRa --> E' una tecnica di modulazione wireless derivante da CSS, è resistente ai disturbi (per la banda più larga(?)) ed 
+         è perciò ottimale per trasmissioni a lunga distanza (soprattutto se la dimensione del payload non è molto grande).
+         La frequenza di trasmissione cambia per area geografica ma generalmente è sub-gigahertz, si può trasmettere anche a 2,4 GHz a costo però di range.
+
+         LoRaWAN --> E' un protocollo presente al livello MAC (sottolivello del livello Datalink insieme a LLC) che serve a definire come i vari dispositivi utilizzano LoRa.
+	    Come già detto è ottimale per comunicazioni a lungo raggio con payload non eccessivi (come data di sensori) dato che rispetto ad altre
+	    tecnologie di wireless data transmission riesce a trasmettere a distanze molto grandi con una larghezza di banda non elevata.
+	    Tra i vantaggi principali troviamo:
+	    
+		- Bassissimo consumo di energia: i dispositivi di end possono durare fino a 10 anni con una singola batteria (coin cell battery(?))
+	    	
+	    	- Lungo raggio: trasmissioni con distanze che vanno fino ai 10km in aree rurali e fino ai 3km in aree cittadine
+	    	
+	    	- Grande copertura indoor
+	    	
+	    	- License-free Spectrum: ha intervalli di frequenze che possono essere utilizzati senza licenza 
+	    	
+	    	- Geolocazione: in una network LoRaWAN un dispositivo di end può essere individuato tramite la triangolazione e quindi senza
+	    			gps (solamente però se almeno 3 gateway ne ascoltano il segnale)
+	    			
+	    	- Grande capacità: il LoRaWAN Network Servers gestisce milioni di messaggi da migliaia di gateways
+	    	
+	    	- Deployment pubblico e privato: è facile effetuare il deployment di networks LoRaWAN sia pubblico che privato usando lo stesso hardware e software
+	    	
+	    	- Sicurezza End-to-end: usa la AES-128 encryption
+	    	
+	    	- Il firmware è aggiornabile da remoto 
+	    	
+	    	- Roaming: si può passare da un network all'altro seamless(?)
+	    	
+	    	- Low cost
+	    	
+	    	- Il programma di certificazione certifica end devices e fornisce a end users la certezza che i devices sono affidabili e in
+	    	  linea con le specifiche LoRaWAN
+	    	  
+	    	- Grande ecosistema di figure che si occupano dello sviluppo e della crescita di LoRaWAN
+	
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	
+	    		   
+Star network --> I dispositivi sono connessi ad un hub o ad uno switch centrale da cui passano tutti i dati	    		   
+	    		   
+Architettura LoRaWAN --> i networks LoraWan sono deployati con una topologia star-of-stars ( più star networks connessi tra loro ). 
+			 sono presenti: 
+			 
+			 - End devices: sensori o attuatori che mandano  messaggi wireless ad un gateways con modulazione LoRa o ricevono messaggi dagli stessi
+			 
+			 - Gateways: ricevono messaggi dagli End Devices e li inoltrano al Network Server 
+			 	
+			 	-Indoor Gateways (picocell): più convenienti, adatti a posti chiusi, hanno un'antenna interna o esterna
+			 	
+			 	-Outdoor Gateways (macrocell): raggio solitamente molto più ampio degli indoor, solitamente c'è un'antenna esterna collegata con cavo 
+			 				       coassiale
+			 
+			 - Application Server: software sul server che si assicura della sicurezza del processamento dei dati, genera anche i downlink 
+			 		       payloads (verso rete inferiore quindi) e tramite il Network Server li invia agli end devices connessi
+			 
+			 - Join Server: software sul server che tratta le richieste di join da dei end devices
+			 
+			 
+			 
+Network server ( in LoRaWAN ) --> The Network Server manages gateways, end-devices, applications, and users in the entire LoRaWAN network.
+
+				   A typical LoRaWAN Network Server has the following features:
+
+				    - Establishing secure 128-bit AES connections for the transport of messages between end-devices and the Application Server
+				    (end-to-end security).
+				    
+				    - Validating the authenticity of end devices and integrity of messages.
+				    
+				    - Deduplicating uplink messages.
+				    
+				    - Selecting the best gateway for routing downlink messages.
+				    
+				    - Sending ADR commands to optimize the data rate of devices.
+				    
+				    - Device address checking.
+				    
+				    - Providing acknowledgements of confirmed uplink data messages.
+				    
+				    - Forwarding uplink application payloads to the appropriate application servers
+				    
+				    - Routing uplink application payloads to the appropriate Application Server.
+				    
+				    - Forwarding Join-request and Join-accept messages between the devices and the join server
+				    
+				    - Responding to all MAC layer commands
+
+
+
+Limitazioni --> esistono precise limitazioni regionali ( in caso approfondire )
+
+
+LoRaWAN Relay --> i relay sono utili in situazioni in cui gli end devices e i gateways non riescono a comunicare direttamente causa distanza, l'hardware è simile a quello
+		  di un end devices. Ogni relay può servire fino a 16 end devices, per il network server il relay appare come un normale end devices.
+		  Funzionamento:
+		  Gli end devices e i relay conoscono a priori il canale di comunicazione su cui scambiarsi i dati.
+		  
+		  1. Un end devices invia un frame WOR (Wake on radio) 
+		  
+		  2. Questo frame "risveglia" il relay e condivide parametri radio ( come frequenza e data rate ) che verranno usati nel successivo frame uplink
+		  
+		  Se non c'è attivita radio il relay entra in una sleep mode dove rimane attivo a bassissimo consumo per scannerizzare periodicamente se sono presenti
+		  attività radio ( CAD o Channel Activity Detection ), questo scan può durare da 25ms a 1s; la durata tra due CAD si chiama CADPeriodicity. 
+		  Il preambolo di un frame WOR dura circa 1s, questo fa si che i frame siano facilmente rilevabili dalla CAD. 
+		  Se il relay rileva qualcosa passa dalla CAD alla Reception Mode, il tempo impiegato per cambiare modalità si chiama CADToRx delay.
+		  In questa modalità il relay de-modula il frame WOR, se l'operazione va a buon fine il relay manda un WOR-ACK all'end devices.
+		  Nel WOR-ACK sono presenti informazioni grazie alle quali l'end device si allinearsi su alcune cose con il relay; tra le info ci sono:
+		  
+		  - CadToRx - the time required to switch from CAD to the reception mode of WOR
+		  
+		  - Forward - indicates the current state of the relay forward limitations
+		  
+		  - RelayDataRate- the data rate used by the relay to forward the end device payload
+		  
+		  - XTALAccuracy - the crystal frequency accuracy of the relay clock
+		  
+		  - CADPeriodicity - the delay between two consecutive CAD scans performed by the relay on a single channel
+		  
+		  - TOffset - the time, in milliseconds, between the start of the scan and the end of the reception of the WOR frame preamble.
+		  
+		 Dopodichè il relay rimane in attesa del seguente frame LoRaWAN frame dall'end device. Dopo averlo ricevuto il relay aggiunge un campo al frame
+		 di 6 bytes. Il frame risultante si chiama Relay Uplink FRMPayload. Successivamente il relay crea un nuovo LoRaWAN frame inserendo il Relay Uplink
+		 FRMPayload nel suo payload. Questo frame viene poi mandato tramite gateways al Network Server 
