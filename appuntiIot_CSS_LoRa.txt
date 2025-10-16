@@ -139,3 +139,226 @@ LoRaWAN Relay --> i relay sono utili in situazioni in cui gli end devices e i ga
 		 Dopodichè il relay rimane in attesa del seguente frame LoRaWAN frame dall'end device. Dopo averlo ricevuto il relay aggiunge un campo al frame
 		 di 6 bytes. Il frame risultante si chiama Relay Uplink FRMPayload. Successivamente il relay crea un nuovo LoRaWAN frame inserendo il Relay Uplink
 		 FRMPayload nel suo payload. Questo frame viene poi mandato tramite gateways al Network Server 
+		 
+		 
+		 
+		 
+		 
+		 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+Device: Nell'IoT pezzo di equipaggiamento con la capacità di comunicare e eventualmente con la capacità di: sensing, actuation, datacapture, data storage and data processing.
+
+IoT: 
+Infrastruttura globale per la information society, fornisce servizi avanzati connettendo (fisicamente (per esempio device)  e virtualmente (per esempio rappresentazioni digitali di oggetti fisici)), è basato su tecnologie esistenti ed in evoluzione
+
+Una "thing" nell'IoT è un oggetto fisico o virtuale che può essere identificato e integrato in comunuication networks.
+
+L'IoT può essere visto in una visione a lungo-raggio con implicazioni sociali e tecnologiche. Sfruttando l'identificazione, il data capture, processing and communication capabilities, l'IoT fa un uso completo delle "things" per offrire servizi a ogni tipo di applicazione
+
+Physical things exist in the physical world and are capable of being sensed, actuated and connected.
+Examples of physical things include the surrounding environment, industrial robots, goods and
+electrical equipment.
+Virtual things exist in the information world and are capable of being stored, processed and
+accessed. Examples of virtual things include multimedia content and application software.
+A physical thing may be represented in the information world via one or more virtual things
+(mapping), but a virtual thing can also exist without any associated physical thing.
+
+Un device è un pezzo di equipaggiamento che obbligatoriamente ha capacità di comunicazione e opzionalente ha quelle di sensing, actuation, data capture, data storage and data processing. I devices collezzionano diversi tipi di informazione e le forniscono ai information e communication networks per ulteriori elaborazioni. Alcuni devices eseguono loro stessi delle operazioni basate sulle informazioni ricevute dai information e communication networks.
+
+I devices comunicano con altri devices tramite communication network via gateway o tramite communication network senza gateway o direttamente; è possibile anche una comunicazione ibrida tra questi casi
+
+Le applications IoT includono diversi tipi di applications, possono anche essere costruite su piattaforme di supporto di servizi/applications comuni che forniscono generiche enabling capabilities tipo authentication, device management, charging and accounting.
+
+Il communication networks trasferisce dati ottenuti dai devices alle applications e a altri devices, oltre che istruzioni dalle applications ai devices. Il communication network fornisce capacità per effettuaredata transfer sicuri ed efficienti e può essere realizzato tramite networks esistenti ( come networks convenzionali basati su TCP/IP o altri)
+
+I device possono essere di due tipi: data-carryng, data-capturing, sensing and actuating device e general device.
+
+
+Data-carrying device: A data-carrying device is attached to a physical thing to indirectly
+connect the physical thing with the communication networks.
+
+Data-capturing device: A data-capturing device refers to a reader/writer device with the
+capability to interact with physical things. The interaction can happen indirectly via
+data-carrying devices, or directly via data carriers attached to the physical things. In the
+first case, the data-capturing device reads information on a data-carrying device and can
+
+
+Sensing and actuating device: A sensing and actuating device may detect or measure
+information related to the surrounding environment and convert it into digital electronic
+signals. It may also convert digital electronic signals from the information networks into
+operations. Generally, sensing and actuating devices form local networks communicate
+with each other using wired or wireless communication technologies and use gateways to
+connect to the communication networks.
+
+General device: A general device has embedded processing and communication capabilities
+and may communicate with the communication networks via wired or wireless
+technologies. General devices include equipment and appliances for different IoT
+application domains, such as industrial machines, home electrical appliances and smart phones.
+
+Le caratteristiche fondamentali dell'IoT sono:
+–
+Interconnectivity: With regard to the IoT, anything can be interconnected with the global
+information and communication infrastructure.
+–
+Things-related services: The IoT is capable of providing thing-related services within the
+constraints of things, such as privacy protection and semantic consistency between physical
+things and their associated virtual things. In order to provide thing-related services within
+the constraints of things, both the technologies in physical world and information world
+will change.
+–
+Heterogeneity: The devices in the IoT are heterogeneous as based on different hardware
+platforms and networks. They can interact with other devices or service platforms through
+different networks.
+–
+Dynamic changes: The state of devices change dynamically, e.g., sleeping and waking up,
+connected and/or disconnected as well as the context of devices including location and
+speed. Moreover, the number of devices can change dynamically.
+–
+Enormous scale: The number of devices that need to be managed and that communicate
+with each other will be at least an order of magnitude larger than the devices connected to
+the current Internet. The ratio of communication triggered by devices as compared to
+communication triggered by humans will noticeably shift towards device-triggered
+communication. Even more critical will be the management of the data generated and their interpretation for application purposes. This relates to semantics of data, as well as efficient data handling.
+
+
+
+		 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LPWAN: 
+Una low-power wide-area network è un tipo di network wirless a wide area creato per permettere comunicazioni a lungo raggio con un basso bit rate tra IoT devices:
+La differenza con un wireless WAN sta che un LPWAN è low power e low bit rate  mentre un wireless WAN usa più energia e porta più data. Il bit rate LPWAN ha un range tra gli 0.3 kbit/s e i 50 a canale.
+
+LPWAN (low-power, wide-area network) is a broad term encompassing various implementations and
+protocols both proprietary and open-source that share common characteristics:
+• Low power: Can operate on inexpensive batteries for long periods of time, e.g., 7 - 10 years
+• Wide area: Has an operating range that can exceed 2 km in urban environments
+
+Le tecnologie LPWAN funzionano bene in situazioni dove i devices devono mandare piccoli pacchetti di dati su un area moltogrande preservando la batteria.
+
+Nell'ambito dell'IoT ci sono 3 distinti segmenti di mercato basati sulla larghezza di banda:
+
+Larghezza di banda alta: per esempio LTE, GSM (cellulari) sono scelte che rientrano in questa categoria e vengono usate per grandi e affidabili data transfer o streaming video/audio in real-time.
+
+Media larghezza di banda: tipo WiFi o Zigbee, servono per esempio per smart home application 
+
+Bassa larghezza di banda: già detto sopra. esempi: sensor monitoring, remote metering, smart infrastructure, agricolture, asset tracking and enviroment monitoring.
+
+Immagine, sito: https://cdn.ai-forall.com/ifa_dev_media/Lo_Ra_Lo_Ra_WAN_Primer_1750b45f5a.pdf
+
+Nel mercato delle LPWAN, ci sono diversi standard in competizione: SigFox, Weightless, RPMA, UNB, and LoRa/LoRaWAN.
+
+LoRa è il physical layer del LPWAN technology stack. E' implementato in un chip proprietario fatto da Semtech e modula i segnali su un raggio lungo. Usa la tecnologia del chirp spread spectrum (CSS) che permette una comnuicazione robusta e low-power su una grande area.
+
+It is critical to understand that LoRa, by itself, does not make it an implementation of LPWAN technology.
+LoRa is simply the chip that enables modulation. To create a network, a media access control (MAC) layer
+is also required. The MAC layer associated with LoRa chips is called LoRaWAN, maintained by the LoRa
+Alliance. LoRa is sometimes used to refer to this entire protocol, but to differentiate Link Labs’ Symphony
+Link that uses a proprietary MAC layer on top of a LoRa chip, this document will take a strict definition of
+LoRa.
+In summary:
+• LoRa = PHY Layer
+• LoRaWAN = MAC Layer
+• LoRa + LoRaWAN = LPWAN
+
+LoRa è una tecnica di modulazione che utilizza la tecnologia CSS. I chips LoRa generano un chirp stabile usando un frac-N phase lock loop (PLL) (?), che è una variazione lineare di frequenza nel tempo. Grazie a questa linearità i receivers LoRa non sono affetti dal Doppler effect (?) e possono essere custruiti senza spendere toppo dato che non è necessario raggiungere un'accuratezza estrema per i frequency offsets.
+
+Compared to traditional frequency shift keying (FSK) and phase shift keying (PSK) modulation schemes, LoRa receivers have a higher out-of-channel selectivity and co-channel rejection of 90 dB and 20 dB respectively. LoRa can also demodulate several orthogonal signals at the same frequency if they have different chirp rates (spreading factors with higher spreading factors denoting slower chirps)
+
+Il LoRa chirp rate dipende solamente dalla larghezza di banda, di fatto il chirp rate è uguale alla larghezza di banda. Sapendo che un simbolo LoRa è codificato da 2S F Chirps (SF e log2 spreading factor) che coprono l'intera banda di frequenza, la relazione tra chirp rate e larghezza di banda comporta importanti conseguenze:
+
+1. Spreading factor is inversely proportional to the frequency span of a chirp and directly proportional to the duration of a symbol.
+2. Spreading factor does not affect the bit rate.
+3. Bit rate at a spreading factor is proportional to the frequency bandwidth
+
+LoRa also includes forward error correction code where the code rate is 4/(4+n) with n {1, 2, 3, 4}. So the useful bit rate is given by the following:
+BitRate = SF × BW⁄2^sf × Code Rate
+In general, receiver sensitivity increases with spreading factor and decreases with more bandwidth. So the theoretical receiver sensitivity per spreading factor and bandwidth are tabulated as following from the SX1276 datasheet
+
+LoRa utilizza una struttura specifica per trasmettere physical frames:
+1. Ogni mess inizia con nu preambolo dove gli up-chirps coprono l'intera frequenza di banda e codifica una sync word. Questa differenzia un LoRa network da altri nella stessa banda di frequenza
+
+2. L'header opzionale fornisce la grandezza del payload, code rate e la presenza del payload CRC
+
+3.Payload e CRC opzionale seguono l'header.
+
+LPWANs target the deployment of Gateways (GWs) operat-
+ing as access points, to support End Devices (EDs) operating
+as sensors (for gathering data of interest) and/or as actuators
+(for performing an action). As such, LPWANs can be con-
+sidered as a type of Wireless Sensor and Actuator Networks
+(WSANs) [9]. From the application perspective, LPWANs
+support applications with low-rate requirements, which implies
+low energy demands for the EDs (they can remain operational
+in the field, with no battery charging or replacement, for
+long periods -a few years-) [10]. Also, from the deployment
+perspective, wide areas are covered with a small amount of
+GWs (due to the long-range type of wireless links). These
+characteristics (low energy demands and long-range support)
+make LPWANs a cost-effective solution for IoT.
+
+These characteristics (low energy demands and long-range support)
+make LPWANs a cost-effective solution for IoT.
+The scope of this paper is to present LPWANs as major can-
+didates for the support of the IoT ecosystem, by decomposing
+various related technologies and revealing research challenges
+and directions. To this end, extra focus is given to the
+Long Range (LoRa)/LoRa Wide Area Network (LoRaWAN)
+systems, which appear to be a prominent solution for wireless
+access over unlicensed spectrum
+
+
+LPWANs define a wireless network family, which can be
+considered as part of the third generation of IoT networking,
+where the focus is the provisioning of cloud services to con-
+nected things [28]. Fig.2 compares the key wireless technology
+families in terms of data rate, range, and power consumption.
+Clearly, the LPWAN technologies are the winners in terms of
+range and power consumptio
+
+
+The following are well-established LPWAN technologies:
+Extended Coverage-Global System for Mobile
+communications-IoT (EC-GSM-IoT), Long Term Evolution-
+Machine type communication (LTE-M), Narrowband-IoT
+(NB-IoT), MY IoT (MIOTY), Random Phase Multiple
+Access (RPMA), Weightless, Wize, Sigfox, and LoRa. The
+first three technologies (i.e., EC-GSM-IoT, LTE-M, and
+NB-IoT) have been defined by the 3rd Generation Partnership
+Project (3GPP) and are referred to as Cellular IoT (CIoT)
+technologies, whereas the rest have not been standardized by
+3GPP. This criterion also splits the technologies into those
+that use the licensed part of the spectrum (3GPP technologies) and those that operate in the license-free spectrum (non-3GPP
+technologies)
+
+
+From an architectural perspective, LPWANs are composed
+of five types of nodes: the EDs and the GWs, which com-
+pose the access-side, and the Network Gateway, the LPWAN
+Authentication, Authorization, and Accounting (AAA) Server,
+and the Application Server, which compose the server-side.
+EDs are deployed in massive numbers and tend to broadcast
+their messages in the hope of being received by a GW that
+covers the area. GWs forward these messages to the server-
+side, where numerous functions at the network and application
+layers take place. At the server-side, the Network Gateway
+receives this transmitted information and either performs in-
+ternal processing or re-distributes the information to the rest
+of the interested parties, i.e., the LPWAN AAA Server and
+the Application Server. Existence of the LPWAN AAA Server
+and the Application Server is optional, because the Network
+Gateway may be able to handle all the necessary server-side
+functionality. Nevertheless, common practices dictate the use
+of dedicated servers for the different functionalities and types
+of messages, e.g., an LPWAN AAA Server may authorize spe-
+cific EDs to participate in the network, whereas an Application
+Server may be the bridging point between internal server-
+side application data and external application end user. A
+growing trend in server-side implementations is the utilization
+of a cloud infrastructure. Although the nomenclature and the
+full node deployment might be different from one technology
+to another, an LPWAN system architecture can be usually
+described by a structure similar to the one depicte
+
+
