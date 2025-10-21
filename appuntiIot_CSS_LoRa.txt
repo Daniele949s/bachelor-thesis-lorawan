@@ -152,7 +152,7 @@ Device: Nell'IoT pezzo di equipaggiamento con la capacità di comunicare e event
 IoT: 
 Infrastruttura globale per la information society, fornisce servizi avanzati connettendo (fisicamente (per esempio device)  e virtualmente (per esempio rappresentazioni digitali di oggetti fisici)), è basato su tecnologie esistenti ed in evoluzione
 
-Una "thing" nell'IoT è un oggetto fisico o virtuale che può essere identificato e integrato in comunuication networks.
+Una "thing" nell'IoT è un oggetto ,fisico o virtuale che può essere identificato e integrato in comunuication networks.
 
 L'IoT può essere visto in una visione a lungo-raggio con implicazioni sociali e tecnologiche. Sfruttando l'identificazione, il data capture, processing and communication capabilities, l'IoT fa un uso completo delle "things" per offrire servizi a ogni tipo di applicazione
 
@@ -361,4 +361,167 @@ full node deployment might be different from one technology
 to another, an LPWAN system architecture can be usually
 described by a structure similar to the one depicte
 
+In the server/control-side of LPWANs, various software
+components are expected (e.g., Network Gateway, Application
+Server, LPWAN AAA Server). Recently the development of
+such software is efficiently supported by open-source so-
+lutions. Practically, a network operator can integrate code
+snippets and stacks that are available in public software
+repositories ([31], [32], [33], [34], [35], [36], [37], [38]).
+Similarly, a service provider can follow the cloud paradigm,
+which offers flexible billing options, either via a fixed billing
+plan or via a pay-as-you-go model. Cloud computing refers to
+the offering of virtualized computing resources, with several
+cloud models in existence
 
+
+CSS: 
+LoRa is an implementation of CSS19, which is a member of
+the Spread Spectrum (SS) family [217]. SS modulations spread
+the signal over a wider BW, achieving better performance
+in terms of intentional interference (jamming), unintentional
+interference, and intentional detection of signals intended for
+others (eavesdropping) [218]. Several SS approaches have
+been proposed over the years, with Direct Sequence SS
+(DSSS) and Frequency Hopping SS (FHSS) being the main
+representatives. Other methods include Time Hopping SS
+(THSS) and Hybrid SS (HSS). LoRa CSS implementation is
+considered as a DSSS alternative [118].
+In this context, the desired signal (which is a sequence of
+bits) is transformed to a sequence of pulses using a code. The
+code is a pseudorandom sequence composed of pulses, which
+are also called chips. Hence, the chip rate of a code is the
+number of pulses per second (chips per second) at which the
+signal is transmitted (or received). Practically, the chip rate,
+𝑅𝑐, equals the spread BW, 𝐵𝑊, so:
+𝑅𝑐 = 𝐵𝑊 (A1)
+For the actual transmission, a sequence of symbols is sent.
+The symbols are defined as the different ways to apply a sweep
+of the signal (a.k.a. chirp) within the available BW
+The number of chips that are used per symbol is a quantity
+derived by the SF and equals to 2𝑆𝐹 . Given that, the symbol
+or chirp rate, 𝑅𝑠 , is calculated by the division of the chip rate
+by the number of chips used in a chirp, thus:
+𝑅𝑠 = 𝑅𝑐
+2𝑆𝐹 (A2)
+The reciprocal of rate is duration, so we can also derive the
+duration of the chip and the chirp (𝑇𝑐 and 𝑇𝑠 , respectively) as:
+𝑇𝑐 = 1
+𝑅𝑐
+= 1
+𝐵𝑊 (A3)
+𝑇𝑠 = 1
+𝑅𝑠
+= 2𝑆𝐹
+𝐵𝑊 (A4)
+For the calculation of the bit rate, we multiply the number
+of bits that are represented in a symbol (or chirp) with the
+symbol rate. Again, the number of bits that a symbol represents
+is derived by the SF and actually equals the value of the 𝑆𝐹
+that is used in the link.
+𝑅𝑏 = 𝑆𝐹 ∗ 𝑅
+
+Nevertheless, the bit rate in LoRa is slightly lower than that,
+due to the inclusion of a FEC scheme. LoRa defines a four-
+value Rate Code, picking an element from the set { 4
+5 , 4
+6 , 4
+7 , 4
+8 }.
+𝑅𝑎𝑡𝑒𝐶𝑜𝑑𝑒 is a fraction that has as a nominator the amount
+of useful information of a message and as a denominator the
+total number of bits, i.e., information bits plus redundant bits
+for error correction. Given the FEC scheme, the bit rate in
+LoRa is as follows (which is actually the equation 1 provided
+in Section X):
+𝑅𝑏 = 𝑆𝐹 ∗ 𝐵𝑊
+2𝑆𝐹 ∗ 𝑅𝑎𝑡𝑒𝐶𝑜𝑑𝑒
+
+
+LoRa è una proprietary spread spectrum modulation scheme derivata da CSS che può sacrificare data rate per la sensitività con una larghezza di banda del canale fissa.
+Cambiando Spreading Factors è possibile cambiare il data rate, ogni SF è indipendente dagli altri (ortogonale) quindi è possibile trasmettere nello stesso canale senza interferire tra loro. Il progettista può decidere se privilegiare portata o batteria a scapito della velocità.
+
+LoRa e una implementazione del Phy layer ed è agnostica (interoperabile) con implementazioni in layer più alti, ciò permette a LoRa di coesistere e operare con architetture network già esistenti
+
+In information theory, the Shannon–Hartley theorem states the maximum rate at which information can
+be transmitted over a communications channel of a specified bandwidth in the presence of noise.
+The theorem establishes Shannon's channel capacity for a communication link and defines the
+maximum data rate (information) that can be transmitted within a specified bandwidth in the presence
+of noise interference:
+   ∗   Equation 1
+Where:
+C = channel capacity (bit/s)
+B = channel bandwidth (Hz)
+S = average received signal power (Watts)
+N = average noise or interference power (Watts)
+S/N = signal to noise ratio (SNR) expressed as a linear power ratio
+By rearranging Equation 1 from log base 2 to the natural log, e, and by noting that ln   we can
+manipulate the equation as follows:
+
+  .  ∗ Equation 2
+For spread spectrum applications the signal to noise ratio is small, since the signal power is often below
+the noise floor. Assuming a noise level such that S/N << 1, Equation 2 can be re-written as:
+
+  
+
+Or:
+ 
+ Equation 3
+From equation 3 it can be seen that to transmit error free information in a channel of fixed noise-to-
+signal ratio, only the transmitted signal bandwidth need be increased.
+
+As has been noted above, by increasing the bandwidth of the signal we can compensate for the
+degradation of the signal-to-noise (or noise-to-signal) ratio of a radio channel.
+In traditional Direct Sequence Spread Spectrum (DSSS) systems, the carrier phase of the transmitter
+changes in accordance with a code sequence. This process is generally achieved by multiplying the
+wanted data signal with a spreading code, also known as a chip sequence. The chip sequence occurs at a
+much faster rate than the data signal and thus spreads the signal bandwidth beyond the original
+bandwidth occupied by just the original signal. Note that the term chip is used to distinguish the shorter
+coded bits from the longer un-coded bits of the information signal.
+
+IMMAGINE
+
+At the receiver, the wanted data signal is recovered by re-multiplying with a locally generated replica of
+the spreading sequence. This multiplication process in the receiver effectively compresses the spread
+signal back to its original un-spread bandwidth, as illustrated below in
+Figure 2. It should be noted that the same chip sequence or code must be used in the receiver as in the
+transmitter to correctly recover the information.
+
+IMMAGINE
+
+The amount of spreading, for direct sequence, is dependent on the ratio of "chips per bit" - the ratio of
+the chip sequence to the wanted data rate, is referred to as the processing gain (Gp), commonly
+expressed in dB.
+  10 ∗ "#
+$%
+$&
+ '()*
+Where:
+RC = chip rate (Chips/second)
+Rb = bit-rate (bits/second
+As well as providing inherent processing gain for the wanted transmission (which enables the receiver to
+correctly recover the data signal even when the SNR of the channel is a negative value); interfering
+signals are also reduced by the process gain of the receiver. These are spread beyond the desired
+information bandwidth and can be easily removed by filtering.
+DSSS is widely used in data communication applications. However, challenges exist for low-cost or
+power-constrained devices and networks.
+Often, as is the case with GPS or the DSSS PHY of IEEE Standard 802.15.4k, the system will require a
+highly accurate and expensive reference clock source. In addition, the longer the spreading code or
+sequence, the longer the time required by the receiver to perform a correlation over the entire length ofè 
+
+
+
+
+username: [REDACTED]
+
+dns: 192.168.17.1 
+se ip cambiano queri al DNS, device: LoRa 0 e LoRa 1
+192.168.17.130
+192.168.17.19
+
+
+
+Step 1: applicazione client-servere tra due device, no gateway quindi connessione punto punto di tipo RTT.
+Step 2: Client-server bidirezionale
+Step 3: simulare drop pacchetti, cambiare SF, ecc
+Step 4: Creare un protocollo anche smeplice che si comporti come TCP/IP, materiale anche su google scholar.  

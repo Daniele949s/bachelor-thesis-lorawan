@@ -18,3 +18,11 @@ Visualizzazione dell'Architettura: Sebbene tu abbia descritto la topologia star-
 Approfondimento MAC Layer: Per la sezione sul Livello MAC (dove risiede LoRaWAN ), potresti includere un breve richiamo al Modello OSI per posizionare meglio il protocollo, specialmente per chiarire la distinzione tra il livello fisico LoRa e il protocollo LoRaWAN (livelli superiori).
 
 Focus su Casi d'Uso: Stai coprendo bene come funziona. Per una tesi, aggiungi una sezione su dove viene applicato, sfruttando i vantaggi chiave (lungo raggio, basso consumo, geolocalizzazione).
+
+
+
+
+
+
+1. Finire fino a dispositivi --> Entro e non oltre mercoledì 22
+2. Fare i primi 3 step della parte di test --> Entro e non oltre Domenica 26

@@ -22,7 +22,7 @@ TUTTI i LoRaWAN device devono implemetare almeno le funzionalità di classe A e 
 LoRa™ is a wireless modulation for long-range low-power low-data-rate applications developed by Semtech. Devices implementing more than Class A are generally named “higher Class end-devices” in this document.
 
 Classe A (end devices bi-direzionali): Gli end-devices devono permettere comunicazioni bi-direzionali dove ogni end-device uplink transmission è seguita da 2 corte downlink receive windows. L'operazione di classe A è l'end device a minor potenza per applicazioni che richiede solamente  una comunicazione downlink dal server poco dopo che l'end device ha mandato una trasmissione uplink, ogni altra trasmissione downlink dal server deve aspettare la prossima trasmissione uplink ( copio perchè poco chiara una parte: This Class A operation is the lowest power end-device system for applications that only require downlink communication from the server shortly after the end-device has sent an uplink transmission. Downlink communications from the server at any other time will have towait until the next scheduled uplink.)
-
+ 
 Classe B (end device bi-direzionali con scheduled receive slots): sono permessi più slot di ricezione. Oltre alla random receive windows della classe A sono aperte più receive windows a scheduled times. Affinche sia aperta una scheduled receive windows l'end device deve ricevere un time synchronized Beacon dal Gateway.
 
 Classe C (End device bi-direzionali con receive slots massimi): Questi end devices aprono continuamente receive windows, chiuse solo durante la trasmissione. Questi device utilizzano più energia rispetto a un device classe A o B ma offrono la minor latenza per una comunicazione da server a end device.
