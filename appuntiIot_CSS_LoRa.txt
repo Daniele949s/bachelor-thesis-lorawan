@@ -511,8 +511,11 @@ sequence, the longer the time required by the receiver to perform a correlation 
 
 
 
-
 username: [REDACTED]
+password [REDACTED]
+
+
+
 
 dns: 192.168.17.1 
 se ip cambiano queri al DNS, device: LoRa 0 e LoRa 1
