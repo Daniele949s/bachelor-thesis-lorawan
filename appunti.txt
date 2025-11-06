@@ -149,7 +149,6 @@ FOpts se presente va criptato prima del calcolo del MIC
 
 FPort deve essere presente se il payload è presente. Se c'è FPort il valore 0 indica che FRMPayload ha solo MAC commands e ogni frame con questa FPort deve essere processato dall'implementazione LoRaWAN. FPort da 1 a 223 sono application-specific e ogni frame con questi valori deve essere reso disponibile all'application layer dall'implementazione LoRaWAN. Il valore 224 invece serve per il LoRaWAN MAC layer test protocol. LoRaWAN implementation deve scartare tutte le richieste di trasmissione dall'application layer con FPort non in 1..224. 225..255 sono riservati a future estensioni dell'application.
 
-
 FRMPayload va criptato prima che il MIC venga calcolato
 
 Il MIC viene calcolato in base a tutti i campi del messaggio
