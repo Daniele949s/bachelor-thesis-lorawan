@@ -1,0 +1,465 @@
+
+
+         
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Uplink: End-Device - Gateway - Network Server
+Downlink: Network Server - Gateway - End-Device
+
+Da lorawan-specification-v1.1: 
+I LoRaWAN networks solitamente risiedono in una stars-of-star topology dove i gateways trasmettono messaggi tra end-devices e un Network server centrale, il quale instrada i pacchetti ricevuti da ogni dispositivo all'Application Server associato. Per rendere sicure le trasmissioni LoRaWAN si appoggia alla crittografia simmetrica (una sola chiave) usando session keys derivanti dal device's root keys (chiavi master memorizzate sul dispositivo usate per derivare/le autenticare le chiavi operative). Nel backend lo storage di queste chiavi e le operazioni derivanti sono assicurate da un Join Server.
+!! Network Server, Application Server e Join Server sono co-located (si trovano nello stesso luogo fisico) !! : Dice solo "in questa specifica"
+
+La comunicazione tra End-Devices e Gateways è sparsa su più canali di frequenza e data rates (velocità con cui i dati vengono trasferiti in un sistema di comunicazione o memorizzazione.), questi ultimi sono selezionati in base al range di comunicazione e la durata del messaggio, comunicazioni con diveri data rates non interferiscono tra loro; i data rates di LoRa vanno da 0.3 kbps a 50 kbps. Per massimizzare sia la battery life degli end-devices sia la capacità totale del network LoRa è in grado di amministrare il data rate e l'RF output (uscita a radiofrequenza di un dispositivo elettronico, RF output è il segnale LoRa modulato inviato all’antenna?) individualmente grazie a un ADR (adaptive data rate) schema
+
+Gli End-Devices possono trasmettere in ogni canale disponibile in ogni moento, usando ogni data rate disponibile, finchè queste regole sono rispettate:
+- L'end device cambia canale in maniera pseudo-casuale per ogni trasmissione. La risultate diversita di frequenza fa si che il sistema sia più robusto alle interferenze
+- L'end device rispetta il massimo duty cicle di trasmissione (rapporto tra tempo in cui un segnale o un dispositivo è attivo e il tempo totale del ciclo) relativo alla sottobanda usata e ai regolamenti locali
+- L'end device rispetta la massima durata di trasmissione, chiamata anche dwell time, relativa alla sottobanda usata e ai regolamenti locali 
+
+
+TUTTI i LoRaWAN device devono implemetare almeno le funzionalità di classe A e in più dovrebbero/potrebbero implementare classe B e C.
+LoRa™ is a wireless modulation for long-range low-power low-data-rate applications developed by Semtech. Devices implementing more than Class A are generally named “higher Class end-devices” in this document.
+
+Classe A (end devices bi-direzionali): Gli end-devices devono permettere comunicazioni bi-direzionali dove ogni end-device uplink transmission è seguita da 2 corte downlink receive windows. L'operazione di classe A è l'end device a minor potenza per applicazioni che richiede solamente  una comunicazione downlink dal server poco dopo che l'end device ha mandato una trasmissione uplink, ogni altra trasmissione downlink dal server deve aspettare la prossima trasmissione uplink ( copio perchè poco chiara una parte: This Class A operation is the lowest power end-device system for applications that only require downlink communication from the server shortly after the end-device has sent an uplink transmission. Downlink communications from the server at any other time will have towait until the next scheduled uplink.)
+ 
+Classe B (end device bi-direzionali con scheduled receive slots): sono permessi più slot di ricezione. Oltre alla random receive windows della classe A sono aperte più receive windows a scheduled times. Affinche sia aperta una scheduled receive windows l'end device deve ricevere un time synchronized Beacon dal Gateway.
+
+Classe C (End device bi-direzionali con receive slots massimi): Questi end devices aprono continuamente receive windows, chiuse solo durante la trasmissione. Questi device utilizzano più energia rispetto a un device classe A o B ma offrono la minor latenza per una comunicazione da server a end device.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Classe A:
+
+Formati messaggi fisici: 
+i messaggi up-link vengono mandati da End-Devices al network server trasmessi da 1 o più gateways. Questi messaggi usano il LoRa radio packet explicit mode (nella explicit mode l'header è presente, nella implicit no) , nel quale il physical header LoRa (PHDR) + un header CRC (PHDR_CRC) sono inclusi. 
+Il pacchetto sarà quindi: preamble - PHDR - PHDR_CRC - PHYPayload - CRC
+I messaggi downlink sono mandati dal network server a un solo end device ed è trasmesso da un solo gateway. Questi messaggi usano la radio packet explicit mode nella quale il PHDR e il PHDR_CRC sono inclusi.
+Il pacchetto sarà quindi: Preamble - PHDR - PHDR_CRC - PHYPayload
+
+Receive windows: Alla fine di ogni trasmissione uplink l'end device deve aprire 2 brevi receive windows. La prima, che chiameremo RX1, utilizza una frequenza che è una funzione della frequenza uplink e un data rate che è una funzione del data rate usato nell'uplink; quindi freq e DR dipendono da quelli uplink.
+RX1 apre quindi dopo un ritardo RECEIVE_DELAY1 (di cui si parlerà dopo) secondi con una certa tolleranza (+/- 20 microsecondi) dopo la fine della modulazione uplink. La relazione tra uplink e RX1 slot downlink data rate è region specific e descritta in [PHY] ??. Di default il datarate di RX1 è identico al DR dell'ultimo uplnk.
+
+RX2 usa una frequenza e un data rate fissi configurabili, apre dopo un ritardo RECEIVE_DELAY2 dopo la fine della uplink modulation. Data rate e frequenza possono essere modificato da comandi MAC, di default seguono le regole regionali.
+
+La durata di una receive windows deve essere almeno del tmepo richiesto dal trasmettitore radio dell'end device per rilevare efficacemente un downlink preamble.
+
+Se un preamble è rilevato durante una delle receive windows, il ricevitore radio rimane attivo finchè il downlink frame non è stato demodulato. Se un frame è stato rilevato e demodulato durante RX1 e il frame era destinato a questo end-device, dopo i checks di address e MIC (message integrity code) l'end-device non deve aprire RX2.
+
+Se il network intende trasmettere downlink ad un end-device, deve iniziare la trasmissione precisamente all'inizio di almeno una delle due receive windows, se un downlink viene trasmesso durante entrambe le finestre i frame identici devono essere trasmessi durante ogni finestra.
+
+Un end device non deve trasmettere un ulteriore messaggio uplink prima che o abbia ricevuto un messaggio downlink in una delle due receive windows della precedente trasmissione, o la RX2 della precedente trasmissione sia già scaduta
+
+Il node può ascoltare o trasmettere altri protocolli o fare qualsiasi transazione(?) radio nel tempo tra la trasmissione LoRaWAN e la reception windows fintanto che l'end-device rimane compatibile con i regolamenti locali e soddisfi le specifiche LoRaWAN
+
+
+
+Formati messaggi MAC:
+Tutti i messaggi uplink e downlink hanno un PHYPayload che è formato in questo modo: MHDR (MAC Header, 1 byte) - MACPayload (7..M bytes m è region specific) o Join/Re_Join request o Join_Accept - MIC (Message Integrity Code, 4 byte)
+Il MHDR è diviso in: MType (7..5 bits, specifica il messaggio) - RFU (4..2 bits) - Major (1..0 versione nel quale il formato è stato codificato)
+A sua volta il MACPayload si divide in: FHDR - FPort - FRMPayload
+A sua volta l'FHDR si divide in: DevAddr - FCtrl - FCnt - FOpts
+
+I tipi di messaggio MAC in LoRaWAN sono 8 e sono:
+000 Join-request
+001 Join-Accept
+010 Uncofirmed Data Up
+011 Unconfirmed Data Down
+100 Confirmed Data Up
+101 Confirmed Data Down
+110 Rejoin-request
+111 Proprietary
+
+Join-req, Rejoin-req e join-acceot sono usati per l'attivazione over-the-air (vedere dopo)
+
+I data messages sono usati per comunicare sia comandi MAC sia application data ed è possibile combinare entrambi in un unico messaggio. Un confirmed-data message deve essere riconosciuto dal ricevente mentre un uncofirmed-data message non deve. Un Proprietary message può essere usato per implementare formati non starnadr di messaggi che non sono interoperabili con messaggi standard ma devono solo essere usati tra disposiivi che hanno una comune comprensione della proprietary extension; se un end-device o un Network Server riceve un messaggio proprietario sconosciuto lo deve scartare. 
+
+L'integrità de messaggi è assicurata in diversi modi in base al tipo di messaggio (se ho ben capito)
+
+Major bit field: 
+00 LoRaWAN R1
+01..11 RFU
+Specifica il formato dei messaggi scambiati nella procedura di join e i primi 4 bytes del payload MAC. Per ogni major version gli end-devices posono implementare differenti minor versions del frame format. La minor versions usata dall'end-devices deve prima essere fatta conoscere al Network Server, questo non avviene via radio tramite pacchetti LoRaWAN, ma con altri mezzi, ad esempio tramite configurazione manuale nel server o tramite un sistema di gestione del dispositivo (Device Management). Se un device o un Network Server ricevono un frame che porta una verione sconosciuta o non supportata di LoRaWAN lo scartano
+
+FHDR e ADR:
+Il MACPayload è diviso in: FHDR - FPort - FRMPayload (FPort e FRMPayload sono optional).
+L'FHDR contiene l'indirizzo device corto dell'end-device (DevAddr), 1 byte di frame control (FCtrl), 2 byte di frame counter (FCnt) e fino a 15 byte di frame option (FOpts) usati per trasportare MAC commands. Se presente Fopts va criptato usando NwkSEncKey.
+FCtrl può avere 7 - 6 - 5 - 4 - 3..0 bits e corrispondono a 
+ADR - RFU - ACK - FPending - FOptsLen  in un frame downlink
+ADR - ADRACKReq - ACK - ClassB - FOptsLen in un frame uplink
+
+I network LoRa permettono agli end-devices di usare ogni possibile data rate e Tx power (Potenza totale emessa dal trasmettitore, quantità totake di potenza emessa). Lo scopo di ciò è adattare e ottimizzare data rate e Tx power di end-devices statici. Questo si chiama ADR (Adaptive Data Rate) e quando è attivato il network sarà ottimizzato per usare il data rate più veloce possibile. L'ADR potrebbe non essere possibile quando il canale radio cambia costantemente in maniera veloce nel tempo; quando questo succede il controllo del data rate passa dal Network Server all'application layer dell'end-device, e quest'ultimo dovrà cercare di variare lo SF (Spreading Factor) minimizzando il tempo totale di air occupation.
+
+Se il bit ADR è settato (1) il network controllerà data rate e Tx power tramite MAC commands. Se l'ADR non è settato il network non proverà a controllare il data rate ne il Tx power. Il network potrebbe comunque mandare comandi per cambiare la Channel mask o i parametri di ripetizione frame. L'ADR settato inoltre informa l'end-device che il Network Server è in posizione di mandare ADR commands, il device può settare/unsettare l'ADR bit.
+
+Se il bit ADR non è settato l'end-device "capisce" che per colpa di rapidi cambiamenti del canale radio il network temporaneamente non può stimare il miglior data rate. In questo caso l'end-device può o unsettare ADR uplink bit e controllare il data rate uplink basandosi su se stesso (strategia tipica di un end-device mobile) oppure può ignorare il fatto e tenere il bit settato aplicando un data rate decay  in assenza di ADR downlink commands (strategia tipica di end-device statici).
+
+Il bit ADR può essere settato/unsettato a comando dall'end-device o dal Network Server; tuttavia, quando possibile, l'ADR scheme dovrebe essere attivato per aumentare la battery life dell'end-device e massimizzare la capacità del network
+Nota: Even mobile end-devices are actually immobile most of the time. So depending on its state of mobility, an end-device can request the network to optimize its data rate using the ADR uplink bit.
+
+Di default la Tx power è la massima potenza di trasmissione permessa er il device considerandone le capacità e le limitazioni regionali. Il device deve usare questo livello di potenza fintanto che il network chiede di fare meno tramite il comando LinkADReq. 
+
+Se il network fa usare un data rate maggiore di quello di default a un certo end-device, o un Tx power minore di quello di default, periodicamente l'end-device deve confermare che il network riceva ancora frame uplink. Ogni volta che il frame uplink counter incrementa (solo per ogni uplink, trasmissioni ripetute non contano) il device incrementa ADR_ACK_CNT counter. Dopo il limite ADR_ACK_LIMIT senza alcuna risposta downlink, l'end device (credo) setta ADRACKReq (bit di richiesta ack). Il Network Server deve quindi rispondere con un frame downlink entro i ADR_ACK_DELAY frames, se viene ricevuto un frame downlink ADR_ACK_CNT si resetta. 
+
+Il bit ACK di downlink non deve essere settato se c'è una qualsiasi risposta durante il receive slot dell'end-device che indichi che il gateway ha ricevuto uplinks da questo dispositivo.
+
+Se nessuna risposta arriva entro i prox ADR_ACK_DELAY uplinks l'end-device deve provare a riconnettersi aumentando la Tx power al default se possibile e diminuendo il data rate al minore più vicino che fornisca un range radio più grande (next lower data rate that provides a longer radio range.) L'End-device deve diminuire ulteriormete il data rate step-by-step ogni volta che si raggiunge l'ADR_ACK_DELAY. Una volta che il device ha raggiunto il minor data rate possibile deve riattivare tutti i canali di frequenza uplink di default.
+
+L'ADRACKReq non deve essere settata se il device usa i suoi dr e Tx di default perchè non si possono intraprendere azioni che aumentino il link range.
+Fare esempio con fig. 14
+
+
+Quando si riceve un confirmed data message, il ricevente deve rispondere con un data frame con il bit di ACK settato. Se il mandante è un end-device il network proverà a mandare un ack usando una delle RX aperte dal device dopo l'operazione di invio. Se il mandante è un gateway l'end-device trasmette un ack a sua discrezione.
+
+La ritrasmissione avviene in questo modo: 
+Downlink frames: un downlink confirmed o unconfirmed non deve essere ritrasmesso usando lo stesso frame counter value. Se è un confirmed downlink, se l'ack non è stato ricevuto, l'application server viene notificato e potrebbe decidere di ritrasmettere un nuovo confirmed frame.
+
+Uplink frames: i frame uplink confirmed e unconfirmed sono trasmessi NbTrans volte, tranne se un downlink valido viene ricevuto dopo una trasmissione. NbTrans può essere usato dal network manager per controllare la redundancy del nodo uplink per ottenere una certa QoS. L'end device deve fare la frequency hopping come sempre tra le trasmissioni ripetute e deve aspettare dopo ogni ripetizione finchè non conferma che RX1 e RX2 sono scadute. Il ritardo tra le ritrasmissioni è a discrezione dell'end device e può essere diverso tra ogni end-device. 
+
+Il device deve fermare ogni ulteriore ritrasmissione di un uplink confirmed frame se un corrispondente ack downlink frame arriva
+-Class B&C devices SHALL stop any further retransmission of an uplink “unconfirmed” frame whenever a valid unicast downlink message is received during the RX1 slot window.
+-Class A devices SHALL stop any further retransmission of an uplink “unconfirmed” frame whenever a valid downlink message is received during the RX1 or the RX2 slot window.
+
+Se il network riceve più di NbTrans trasmissioni dello stesso frameuplink, questo potrebbe indicare un replay attack o un device malfunzionante, quindi i frame extra nn vanno processati.
+
+Ricordiamo i bit di FCtrl (downlink): ADR - RFU - ACK - FPending - FOptsLen
+Fpending è usato solamente nelle comunicazioni downlink, indica che il network ha più data in attesa di essere andata e quindi chiede all'end-device di aprire un'altra RX asap mandando un altro messaggio uplink.
+
+Ogni end-device ha più frame counters per tenere traggia del numero di data frames mandati uplink al Network Server (FCntUp) e downlink dal Network Server (FCntDown).
+Nel downlink ci sono due diversi counter scheme, in uno tutte le porte condividono lo stesso FCntDown quando il device opera come un LoRaWAN 1.0 device, nell'altro ci sono 2 counter:  un NFCntDown è usato per le MAC communication sulla porta 0 e se FPort è assente; mentre un AFCntDown per tutte le altre porte in cui il device opera come LoRaWAN 1.1 device. NFCntDown è gestito dall'Network Server. AFCntDown dall'application server.
+
+Quando un OTAA device (Over the air activation) elabora con successo un messaggio di Join-accept, i frame counters dell'end-device e del network per quell'end-debice sono azzerati
+I device ABP (Activazion by personalization) invece hanno i frame counters inizializzati a 0 alla costruzione. Dopodichè non devono mai essere resettati durante il device's life time. Se l'end-device è a rischi di perdere potenza durante la sua life time i frame counters devono resistere a questo evento.
+
+FCntUp incrementa con ogni uplink
+NFCntDown con ogni downlink su FPort 0 o quando FPort non c'è.
+AFCntDown incrementa con ogni downlink in porte differenti da 0
+Nella parte ricevente il counter corrispondente è in sync con il valore ricevuto, questo viene fatto tramite confronto con i valore ricevuto e con il MIC del messaggio. FCnt non aumenta nel caso di trasmissioni multiple di un confirmed o unconfirmed frame. Il Network Server deve scartare l'application payload dei frame ritrasmessi e inviarne una singola istanza all'application server.
+
+I frame counters sono di 32 bits, in particolare FCnt solo i 16 bits meno significativi.
+
+Un end-devices non dovrebbe mai riutilizzare lo stesso FCntUp con lo stesso application o network session keys, tranne per la ritrasmissione dello stesso confirmed o unconfirmed frame. Inoltre non dovrebbe oricessare alcuna ritrasmissione dello stesso frame downlink ma ingnorarle.
+
+
+FOptsLen nel byte FCtrl denota la lunghezza di FOpts, questo trasporta MAC Commands di una lunghezza max di 15 byte. Se FOptsLen è 0 non c'è FOpts, altrimenti sono presenti MAC commands e FPort non può avere la porta 0. 
+
+MAC commands non possono essere presenti simultaneamente nel payload e in FOpts, se succede va ignorato il frame. 
+
+FOpts se presente va criptato prima del calcolo del MIC
+
+
+FPort deve essere presente se il payload è presente. Se c'è FPort il valore 0 indica che FRMPayload ha solo MAC commands e ogni frame con questa FPort deve essere processato dall'implementazione LoRaWAN. FPort da 1 a 223 sono application-specific e ogni frame con questi valori deve essere reso disponibile all'application layer dall'implementazione LoRaWAN. Il valore 224 invece serve per il LoRaWAN MAC layer test protocol. LoRaWAN implementation deve scartare tutte le richieste di trasmissione dall'application layer con FPort non in 1..224. 225..255 sono riservati a future estensioni dell'application.
+
+FRMPayload va criptato prima che il MIC venga calcolato
+
+Il MIC viene calcolato in base a tutti i campi del messaggio
+!!! Non mostro ne come viene calcolato ne come vengono criptati i campi da criptare !!!
+
+
+
+
+
+
+MAC COMMANDS
+Possono essere scambiati esclusivamente tra Network Server e MAC layer dell'end-device, non sono mai visibili all'application o all'application server o all'aplication che runna sull'end-device.
+
+Un singolo data frame può contenere qualsiasi sequenza di MAC commands, o trasportati da FOpts o nel FRMPayload con FPort settato a 0. Un MAC command cosiste in un Command Identifier (CID) di 1 byte seguito da una sequenza di byte che rappresenta il comando.
+
+I MAC commands sono answered/acknowleged dal ricevente nello stesso ordine della loro trasmissione. La risposta viene aggiunta sequenzialmente a un buffer.
+Tutti i MAC commands ricevuti in un frame devono essere risposti in un singolo frame, quindi il buffer con la risposta deve essre in un singolo frame. Se il buffer è più grande della lunghezza max di FOpt, il dispositivo deve mandare il buffer come FRMPayload sulla porta 0; se ha sia un application payload che un MAC answer da mandare e non entrano nello stesso frame la MAC answer ha la priorità.
+
+Se la lunghezza del buffer è più grande del max size di FRMPayload il dispositivo deve "CLIP" (?) alla max FRMPayload size prima di assemblare il frame, quindi può accadere che le ultime MAC answers vengano troncate. In ogni caso comunque la lista completa dei MAC commands va eseguita.
+Il Network Server non dovrebbe generare una sequenza di MAC commands a cui il device non possa rispondere in un singolo uplink, deve elaborare la massima disponibilità del FRMPayload così:
+-If the latest uplink ADR bit is 0: The max payload size corresponding to the lowest data rate MUST be considered
+-If the latest uplink ADR bit is set to 1: The max payload size corresponding to the data rate used for the last uplink of the device MUST be considered
+
+
+MEGA IMMAGINE DEI COMANDI con spiegazioni ---> decidere cosa fare. ( ovviamente mettere immagine, decidere se approfondire comando per comando o qualche comando o niente ) ora come ora forse sarebbe bene dare una veloce spiegazione a ogni comando e approfondire quelli più importanti.
+
+
+
+End-Device Activation:
+Per partecipare ad un LoRaWAN Network ogni end-device deve essere personalizzato e attivato. L'attivazione avviene o Over The Air (OTAA) o via Activation By Personalization (ABP).
+
+JoinEUI è un global application ID nell' IEEE EUI64 address space che identifica unicamente il Join Server che è in grado di assistere la procedura di join e la session key derivation. Per gli OTAA devices il JoinEUI deve essere conservato nell'end-devices prima che la join procedure sia eseguita, per gli ABP only non è invece richiesto il JoinEUI
+
+DevEUI è un id globale dell'end device nell'IEE EUI64 address space che identifica unicamente l'end device. DevEUI è l'id identificatovo raccomandato dal Network server in qualsiasi activation procedure. Nei device OTAA DevEUI deve essere conservato nell'end-device prima della Join procedure mentre nei device ABP non è obbligatorio ma raccomandato.
+
+Device root keys:
+NwkKey e AppKey sono AES-128 root keys (chiavi pre-shared utilizzate per derivare tutte le session keys) specifice per l'end-device che sono assegnate a questo durante la costruzione. Ogni volta che un end-device joina via OTAA la NwkKey si usa per derivare FNwkSIntKey , SNwkSIntKey and NwkSEncKey session keys, mentre AppKey per derivare AppSKey session key. 
+
+In un Network Server versione 1.1 l'application session key è derivata solamente dall'AppKey, quindi la NwkKey potrebbe essere surrended all'network operator per amministrare la Join procedure senza enabling the operator to eavesdrop on the application payload data.(?)
+
+Per assicurare retro-compatibilità cn LoRaWAN 1.0 e versioni precedenti che non supportano due root keys, l'end-device quando entra in un network simile deve usare il single root key scheme. Viene usata solo la root NwkKey in questi casi. Questa condizione è segnalata agli end-device tramite l'OptNeg bit = 0 del DLsetting field nel Join-accept message. Quindi in questi casi l'end-device usa solo la NwkKey per derivare la AppSKey e la FNwkSIntKey, inoltre deve settare la SNwkSIntKey e la NwkSEncKey uguali alla FNwkSIntKey.
+
+A NwkKey MUST be stored on an end-device intending to use the OTAA procedure.
+A NwkKey is not required for ABP only end-devices.
+An AppKey MUST be stored on an end-device intending to use the OTAA procedure.
+An Appkey is not required for ABP only end-devices.
+Both the NwkKey and AppKey SHOULD be stored in a way that prevents extraction and re-use by malicious actors.
+
+
+Per i dispositivi OTA ci sono 2 lifetime keys derivate dalla NwkKey root key: 
+-JSIntKey usata per fare MIC Rejoin-Request type 1 messages e Join-Accept answers
+-JSEncKey usata per criptare la Join-Accept triggerata da una Rejoin-Request
+
+
+
+Dopo l'attivazione nell'end device si conservano il device address (DevAddr), 3 network session keys (NwkSEncKey, SNwkSIntKey, FNwkSIntKey) e un application session key.
+
+DevAddr consiste in 32 bits è identifica l'end-device nel network corrente, è allocato dal Network Server nell'end-device  !!IMMAGINE!!	
+!! SPIEGAZIONE IMMAGINE !!
+
+La FNwkSIntKey è una network session key specifica per l'end device, è usata da questo per calcolare il MIC o parte del MIC di tutti gli uplink data messages per assicurare la data integrity (vedi 4.4).
+
+la SNwkSIntKey è una network session key specifica per l'end device usata da questo per verificare il MIC di tutti gli downlink data messages per assicurare data integrity e elaborare meta dei uplink messages MIC. Se siamo in un ambiente LoRaWAN1.0 SNwkSIntKey e FNwkSIntKey hanno lo stesso valore.
+
+La NwkSEncKey è una network session key specifica per l'end-device usata da questo per criptare e decriptare uplik e downlink MAC comman trasmessi tramite payload nella porta 0 o trasmessi in FOpt. In LoRaWAN1.0 ha lo stesso valore di FNwkSIntKey
+
+La AppSKey è una application session key specifica per l'end devic usata sia da questo sia dall'application server per criptare e decriptare il campo payload dei messaggi application-specific. Gli application payloads sono criptati end-to-end tra end device e applictaion server, la loro integrity è protetta in una maniera hop-to-hop(?): un hop tra end-device e Network server e un hop tra Network Server e Application Server. A causa di ciò un Network Server malevolo potrebbe essere in grado di alterare il contenuto del data message in transnito, cosa che potrebbe anche far si che emerganp dettagli sul contenuto del messaggio
+
+
+Il Contesto di Sessione contiene Network Session e Application Session:
+The Network Session consists of the following state:
+F/SNwkSIntKey
+NwkSEncKey
+FCntUp
+FCntDwn (LW 1.0) or NFCntDwn (LW 1.1)
+DevAddr
+The Application Session consists of the following state:
+AppSKey
+FCntUp
+FCntDown (LW 1.0) or AFCntDwn (LW 1.1)
+Network Session state is maintained by the NS and the end-device. Application Session state is maintained by the AS and the end-device.
+
+Dopo il completamento di una procedura OTAA o ABP, un nuovo security session context è stato stabilito tra NS/AS e l'end-device. Chiavi e indirizzi dell'end-device sono fissati per la durata della sessione e i counters incrementano col traffico.
+
+
+OVER THE AIR ACTIVATION:
+Gli end-devices devono seguire una join procedure prima di scambiare dati col Network Server, se un end-device perde il contesto di sessione deve rifare la join procedure. I requisiti per iniziare la procedura sono che l'end-device abbia: DevEUI, JoinEUI, NwkKey e AppKey
+
+La procedura consiste dal punto di vista di un end-device in: Join o Rejoin-request e Join-accept
+Nel join-request si manda un messaggio contenente JoinEUI, DevEUI e DevNonce.
+DevNonce è un counter che parte da 0 e incrementa con ogni join request e si resetta quando il device si accende. Se l'end device può essere power-cycled va reso persistente e DevNonce non deve mai essere riusato per un dato JoinEUI.
+
+La join-accept è la risposta del server di conferma, è mandata come un normale downlink ma usa i delay JOIN_ACCEPT_DELAY1 o JOIN_ACCEPT_DELAY2 al posto di RECEIVE_DELAY1/2. La frequenza del canale e il data rate usati per queste due receive windows sono uguali a quelli usati per RX1 e RX2 descritti in precedenza.
+
+Se l'operazione va male non si inviano risposte.
+
+La join-accept contient una server nonce JoinNonce, un newtork identifier NetID, un end-device addres DevAddr, un DLSetting che provvede alcuni parametri downlink, il delay tra TX e RX RxDelay e una lista opzionale di network parameters CFList del network che l'end-device sta joinando
+
+Il JoinNonce è un counter dato dal JoinServer usato dall'end-device per derivare FNwkSIntKey, SNwkSIntKey, NwkSEncKey e AppSKey. Incrementa con ogni join-accept message. 
+!! roba che non ho scritto decidere poi !!
+
+
+NetID è un network identifier di 24 bits, alcuni di questi id sono riservati per network privati/sperimentali
+
+Il DLsettings contiene la configurazione downlink : OptNeg, RX1DRoffset, RX2 Data Rate
+OptNeg indica il protocollo LoRaWAN da implementare
+
+JoinReqType è un campo da 1 byte che codifica la tipologia di Join-request o Rejoin-request
+
+!! un pò di romba che non sto scrivendo !!
+
+Il ritardo RxDelay segue le stesse convenzioi del Delay nel RXTimingSetupReq command.
+
+
+ReJoin-request
+Una volta attivato un device deve ogni tanto trasmettere una Rejoin-request che periodicamente da al backend la possibilità di inizializzare un nuovo session context per l'end-device. Il Network Server risponde con un Join-Accept. Il Network Server può usare le Rejoin-request RX1 e RX2 windows er trasmettere confirmed o unconfirmed downlink frame con anche in caso MAC commands. Questo serve per resettare i parametri di ricezione del device in caso ci sia un MAC layer de-sync state tra il device e il Network Server.
+
+Ci sono 3 tipi di rejoin-request:
+!!IMMAGINE!! + spiegare i 3 tipi
+
+
+Activation By Personalzation
+Lega direttamente un end-device ad un Network Server senza la Join Procedure. In questo caso DevAddr e le 4 session keys sono conservate direttamente nell'end-device senza essere derivate da DevEUI, JoinEUI, AppKey e NwkKey durante la join procedure. L'end-device ha tutte le informazioni richieste per partecipare ad uno specifico LoRa network appena viene acceso. 
+
+Quando un dispositivo accede in questo modo alla rete per la prima volta o dopo una re-inizializzazione deve trasmettere il ResetInd MAC command nel FOpt di tutti i mess uplink finchè non riceve un ResetConf command dal network. Dopo una re-inizializzazione il device deve usare la sua configurazione di defualt.
+
+
+
+Retransmission back-off:
+I frame uplink che:
+-richiedono un ack o una risposta dal network o dall'app server, e sono ritrasmessi dal device se l'ack o la risposta non vengono ricevute
+- Possono essere triggerati da un evento esterno causando sync attorno a un grande numero di device 
+Possono triggerare una persistente, catastrofica situazione di overload del radio network.
+
+Per la ritrasmissione di questi frame l'intervallo tra la fine del RX2 slot e la prox uplink retransimssion deve essere random e seguire diverse sequenze per ogni dispositivo.
+!! IMMAGINE !!
+
+
+
+
+
+CLASSE B:
+
+
+INTRODUZIONE
+
+La classe B è ideale per gli ED alimentati a batteria. Gli ED dovrebbero implementare la classe B quando c'è una necessità di aprire receive windows a certi fissati intervalli di tempo con lo scopo di permettere l'invio di messaggi downlink anche senza aver ricevuto prima uplink. Quindi la classe B aggiunge reception windows sincronizzate all'ED.
+Una dell limitazioni della classe A è che il netser è impossibilitato nel prevedere quando avviare una comunicazione dlk. Nella classe B invece, con l'introduzione di un concetto di sincronizzazione tramite beacon inviati dal gateway, il dispositivo sa esattamente quando mettersi in ascolto del server aprendo una reception window chiamata ping slot
+
+
+PRINCIPI DELLA RETE DINCRONIZZATA
+Affinchè una rete supporti ED di classe B, tutti i gateways devono sincroneamente(?) mandare in broadcast un beacon che fornisca un riferimento temporale all'ED. Basandos su questo l'ED può aprire periodicamente ping slots, che possono essere usati dall'infrastruttura di rete per iniziare una comunicazione downlink. Un downlink che usa uno di questi slots viene chiamato ping. Dato che il gateway scelto per iniziare questa comunicazione è scelto in base alla qualità del segnale dell'ultimo uplink dell'ED, se l'ED si sposta deve inviare un ulk all netser in mo do tale da permettergli di aggiornare il routing path dlk.
+
+
+Tutti gli ed iniziano essendo di classe A, l'end device application può poi decidere se cambiare alla B tramite questo processo:
+-Ed application chiede al LoRaWAN layer di cambiare alla classe B, il LoRaWAN layer nell'ED cerca per un beacon e restituisce o BEACON_LOCKED service primitive all'aplcitaion se il beacon e stato trovato e chiuso o BEACON_NOT_FOUND service primitive. 
+
+-Una volta nella classe B il MAC layer setta a 1 il Class B bit nel FCTRL field di ogni ulk frame trasmesso (per segnalare cosi il cambiamento al netser). Il mac layer autonomamente programmerà un reception slot per ogni beacon e ogni ping slot. Quando il beacon reception è succesful, il LoRaWAN layer dell'ED invia il contenuto del beacon all'application insieme alla misura della forza del segnale radio. Quando un dlk è demodulato correttamente durante un ping slot viene poi processato similmente a una normale dlk.
+
+- Un ED mobile deve periodicamnte informate il netser della sua posizione per aggiornare la dlk route. Questo avviene trasmettento un ulk uncofirmed o confiemrd normale. 
+
+-In qualsiasi momento il netser può cambiare il ping slot frequency o data rate del dispositivo mandando un mac command PingSlotChannelReq.
+
+- Il dispositivo può cambiare la periodicità dei suoi ping-slots in ogni momento. Per farlo dee temporanemtne stoppare le operazioni di classe B e mandare un PingSlotInfoReq al netser, quando questa op è ack l'ed può riprendre le operazioni di classe B.
+
+-Se nessun beacon viene ricevuto entro un certo periodo, la sincronizzazzione con la rete viene perduta. Il mac layer deve informare l'application layer che è tornato alla classe A.
+
+
+Foto:!!!!!!!!!!!!!!!!
+
+
+Ulk frame nella classe B:
+I frame ulk sono guali a quelli della classe A tranne che per L'RFU BIT nel campo FCtrl: nella classe A è inutilizzato, nella B si. é un class B bit settato a 1  che segnala che l?ED è in classe b.
+
+
+
+
+Downlink ping format:
+
+Pyshical frame format : uguale a classe A
+
+Unicast e Multicast Mac messages:
+I meggassgi possono essere unicast o multicast. I primi sono inviati ad un singolo ed e i multicasi a molteplici. Tutti i dispositivi di un gruppo multicast devono condividere lo stesso mc addess e le associate chiavi cencryption. 
+
+Formato mac unicast:
+Il MAC payload di un dlk ping usa lo stesso formato della classe A ed è processato identicamente.
+
+Formato mac multicst:
+I frame multicast hanno in gran parte lo stesso formato di quelli unicast con alcune eccezzioni:
+- Non possono portare mac commands, ne in FOpt ne nel payload sulla porta 0
+
+- Ack e ADRACKReq devono essere 0. Il campo MType deve portare il valore di un Uncofirmed Data Down.
+
+- Il bit di FPending deve indicare se ci sono più dati multicast da inviare. Se è settato il prossimo multicast receive slot porterà un frame data. Se non è settato il prossimo receive slots può e non può portare data.
+
+
+Beacon acquisition and tracking:
+Prima di switchare da classe A a classe B, l'ed deve prima ricevere uno dei beacons di rete per allineare il suo timing interno con la rete. Una volta nella classe B, l'ED deve periodicamente cercare e ricevere un beacon di rete per eliminare ogni errore del suo orologio interno per allinearlo nuovamente.
+Un dispositivo di classe B può temporaneamente essere inabile a ricevere beacons. Se succede l'ed deve allargare gradualmente il suo ping slots  e beacon reception windows per eliminare eventuali clock drift
+
+Tempo di operazione senza beacon: se succede il dispositivo deve mantenere le operazioni di classe B per 2 ore dopo la ricezione dell'ultimo beacon .
+During beacon-less operation, unicast, multicast and beacon reception slots must all be
+progressively expanded to accommodate the end-device’s possible clock drift.
+Durante questa modalità, la ricezione di un beacon diretto all'ED deve estendere la durata massima di questà modalità di altre 2 ore
+
+Foto:!!!!!!!!!!!!!!!!
+
+
+Dowlink slot timing:
+Per operare correttamente nella classe B, l'ed deve aprire reception slots in precisi istanti relativi al beacon infrastruttura(?). 
+L'intervallo tra l'inizio di 2 beacon successivi si chiama beacon period. Il beacon frame trasmission è allineato con l'inizio dell'intervallo BEACON_RESERVED. Ogni beacon è preceduto da un intervallo di guard time(?) dove non possono essere avviati ping slots, la lunghezza di questo intervallo corrisponde al tempo on air del longest allowed frame. 
+This is to insure that a downlink initiated during a ping slot just before the guard time will
+always have time to complete without colliding with the beacon transmission.
+The usable
+time interval for ping slot therefore spans from the end of the beacon reserved time interval
+to the beginning of the next beacon guard interval.(?)
+
+
+FOTO:!!!!!!!!
+
+
+Slot randomization: per evitare sistematice collisioni lo slot index è randomizzato e cambiato a ogni beacon period. 
+
+
+CLASS B MAC COMMANDS:
+FOTO:!!!!!!!!!!
+
+
+
+
+BEACONING: CLASS B OPTION
+
+I gatewaus, oltre a inoltrare messaggi tra ed e netser, devono provvedere una sincronizzazione temporale mandando beacons a certi intervalli prefissati. Tutti i beacons sono trasmessi in un pacchetto radio in implicit mode, senza però un header fisico LoRa e senza CRC. Il preamble del beacon deve iniziare con 10 simboli non modulati, questo perette agli ed di implementare una ricerca beacon a basso consumo. 
+
+Il frame contiene un payload BCNPayload che consiste in una parte comune di rete e una parte specifica gateway.
+foto
+La parte comune ha un RFU, un campo timestamp Time in secindu, un CRC
+La parte specifica gateway provvede informazioni aggiuntive sul gateway che manda il beacon e può essere diversa da ogni gateway. L'ascolto e la sincronizzazione alla parte comune di rete è sufficiente per operare un ed fisso di classe B. Se l'ed è mobie deve anche demodulare la parte specifica per essere in grado di segnalare quando si muove. E' composta da un campo InfoDesc e un campo Info da 6 byte.
+foto InfoDesc
+
+
+Quando un device di classe B si muove e cambia posto deve comunicarlo al netser per updatare la dlk route. 2 strategie:
+-sistematici periodici ulk
+-ulk ogni cambio di posto
+
+
+
+CLASSE C
+
+Introduzione:
+Gli ed che implementano la classe c sono usati per applicazioni che hanno una sufficiente potenza disponibile e non devono minizzare il tempo di ricezione. Non devono implementare la classe B. Un ed di classe C ascolterà con i parametri di RX2 (data rate, frequency, receive delay2) il più a lungo possibile e più spesso possivile, e lo può fare quando non sta inviando o ricevendo sulla rx1. Deve perciò aprire una breve finestra usando i parametri di RX2 tra la fine della tramisssione uplink e l'inizio di rx1 e deve switchare ai parametri di ricezione di RX2 non appena RX1 viene chiusa. RX2 deve poi rimanere aperta finchè l'end device non deve inviare un nuovo messaggio.
+Se un messaggio, che richiede una risposta, viene ricevuto da un dispositivo in classe C, questo deve rispondere entro un tempo prestabilito e prima che il tempo finisca il network non deve inviare nuovi confirmed messages o MAC command al dispositivo.
+
+Classe C implementa le stesse rx della classe A ma non chiude la RX2 finchè non deve inviare di nuovo. Perciò può essere ricevuto, durante la RX2, un dlk in qualsiasi momento.
+
+FOTO
+
+
+multicast dlk:
+Similmente alla classe B, i device di classe C possono ricevere frame dlk multicast e hanno le stesse regole della classe B
+
+mac comands:
+implementazione di tutti quelli di classe A + FOTO
+
+
+
+
+
+
+
+
+
+
+
+\\
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Certificare un end-device e test: 
+
+Per verificare che un end-device possa essere certificato viene effettuato un test di inter-operabilità tra end-device e network server. Il controllo consiste in più test che vanno a evidenziare se nell'esecuzione di questi il normale comportamento dei network elements viene alterato, portandoli a comportamenti "anomali" (This test plan describes specific test cases which can be executed without changing conditions which would cause any
+of the network elements to act in a way which is not normal in everyday operation.).
+Quindi l'obiettivo e accertarsi della compatibilità e di validare la funzionalità dell'end device (join the network, send uplink and recive downlink, maintain required communication parameters).
+
+
+Interoperability test setup:
+
+L'ambiente e il setup per il test comprende una configurazione strutturata che permette la valutazine delle capacità del device e della sua compatibilità col network. L'interoperability test si può condurre in un ambiente simile a una "Plug fest" (Un plugfest è un evento tecnico in cui diversi produttori o sviluppatori portano i propri dispositivi o software per testare l’interoperabilità tra implementazioni diverse di uno stesso standard.), quindi differenti elementi del network, End Devices, Gateways, Network servers, Join Servers e/o Application server sono connessi tra loro.
+
+Network server: Componente centrale per il processamento dei messaggi dagli End-Devices va configurato per la versione corretta.
+
+End-Devices: Possono essere sensori, attuatori o ogni altro tipo di IoT device designato per la comunicazione tramite LoRaWAN. L'End device da testare deve avere la stessa configurazione dei devices reperibili sul mercato
+
+Gateways: Serve come collegamento comunicativo tra gli End Devices e il Network Server
+
+Servono inoltre test per analizzare pacchetti, monitorare il network e catturare i log (usati per verificare se il comportamento del sistema è corretto). Esempi: Whireshark, TCPDump.
+
+Bisogna anche eseguire un setup dell'infrastruttura, posizionando per esempio il Gateway ad una distanza dalla quale copre adeguatamente gli End-Devices oppure accertandosi che il frequency plans sia permesso dal regolamento regionale.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Solitamente i dispositivi che usano tecnologie come LoRa hanno un deployment centralizzato, sostenuto da municipalità o da entità private, che crea servizi che eventualmente espongono dati ai cittadini o altri stakeholder. Questo modus operandi presenta difficoltà sostanziali per nuove iniziative: di fatto la combinazione di un investimento iniziale molto elevato, modelli di reddito poco certi e la complessità di navigazione di un ecosistema frammentato  rendono la monetizzazione difficile, rendendo la vita difficile a nuovi stakeholder per giustificare un investmento.
+Una soluione possibile può essere tramite lo Smart Home Gateway (SHG), che si comporta come un ponte tra i sensori fisici, le smart home e la città.
+
+Smart home:A smart home is a residence equipped with internet-connected devices that can be remotely monitored and controlled.
+
+L'shg rappresenta una architettura pluggable che permette di interfacciare seamlessly locally scoped data con servizi interni ed esterni , permettendo così la creazione di servizi scalabili e di valore aggiunto per la comunità. Questo è in contrasto ad altri modelli partecipatori LoRaWAN dove il gw si comporta solamente da inoltratore di pacchetti e si appoggia su unastruttura backend centralizzata. Dato che shg architecture permette un paradigma decentralizzato permettendo di distribuire data e network managment responsibilietes su una rete di shg
+Community-driven LoRa networks Urban sensing Empow-
+ered by Smart homes (CLUES) embraces denser and more
+scalable network deployments with better or comparable
+performance to that of standalone Long Range Wide Area
+Network (LoRaWAN) technology, while retaining the benefits
+of lower network deployment and management costs
+

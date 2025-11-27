@@ -1,0 +1,530 @@
+IoT (Internet delle cose) --> Rete molto grande di dispositivi fisici dotati di sensori, software e connettività di rete tramite i quali si scambiano dati. 
+			      Cioè gli smart objects (i dispositivi di cui si parlava prima) raccolgono e comunicano dati su loro stessi e visualizzano dati di altri.
+			      Quindi estensione di internet a oggetti e luoghi concreti.
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Sensori --> Rileva grandezze fisiche e le converte in segnali elettrici e non che possono essere comunicate ad un sistema e processate da esso
+
+Attuatori --> Converte segnali in azioni fisiche
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Chirp Spread Spectrum --> E' una tecnica di modulazione che utilizza dei segnali analogici la cui frequenza 
+                          varia in modo continuo nel tempo (quindi una modulazione FM), chiamati chirp, per trasmettere dati.
+                          Utilizza una banda più ampia rispetto a quella del segnale originale per ridurre i danni da 
+                          eventuali interferenze o rumori.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LoRa --> E' una tecnica di modulazione wireless derivante da CSS, è resistente ai disturbi (per la banda più larga(?)) ed 
+         è perciò ottimale per trasmissioni a lunga distanza (soprattutto se la dimensione del payload non è molto grande).
+         La frequenza di trasmissione cambia per area geografica ma generalmente è sub-gigahertz, si può trasmettere anche a 2,4 GHz a costo però di range.
+
+         LoRaWAN --> E' un protocollo presente al livello MAC (sottolivello del livello Datalink insieme a LLC) che serve a definire come i vari dispositivi utilizzano LoRa.
+	    Come già detto è ottimale per comunicazioni a lungo raggio con payload non eccessivi (come data di sensori) dato che rispetto ad altre
+	    tecnologie di wireless data transmission riesce a trasmettere a distanze molto grandi con una larghezza di banda non elevata.
+	    Tra i vantaggi principali troviamo:
+	    
+		- Bassissimo consumo di energia: i dispositivi di end possono durare fino a 10 anni con una singola batteria (coin cell battery(?))
+	    	
+	    	- Lungo raggio: trasmissioni con distanze che vanno fino ai 10km in aree rurali e fino ai 3km in aree cittadine
+	    	
+	    	- Grande copertura indoor
+	    	
+	    	- License-free Spectrum: ha intervalli di frequenze che possono essere utilizzati senza licenza 
+	    	
+	    	- Geolocazione: in una network LoRaWAN un dispositivo di end può essere individuato tramite la triangolazione e quindi senza
+	    			gps (solamente però se almeno 3 gateway ne ascoltano il segnale)
+	    			
+	    	- Grande capacità: il LoRaWAN Network Servers gestisce milioni di messaggi da migliaia di gateways
+	    	
+	    	- Deployment pubblico e privato: è facile effetuare il deployment di networks LoRaWAN sia pubblico che privato usando lo stesso hardware e software
+	    	
+	    	- Sicurezza End-to-end: usa la AES-128 encryption
+	    	
+	    	- Il firmware è aggiornabile da remoto 
+	    	
+	    	- Roaming: si può passare da un network all'altro seamless(?)
+	    	
+	    	- Low cost
+	    	
+	    	- Il programma di certificazione certifica end devices e fornisce a end users la certezza che i devices sono affidabili e in
+	    	  linea con le specifiche LoRaWAN
+	    	  
+	    	- Grande ecosistema di figure che si occupano dello sviluppo e della crescita di LoRaWAN
+	
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	
+	    		   
+Star network --> I dispositivi sono connessi ad un hub o ad uno switch centrale da cui passano tutti i dati	    		   
+	    		   
+Architettura LoRaWAN --> i networks LoraWan sono deployati con una topologia star-of-stars ( più star networks connessi tra loro ). 
+			 sono presenti: 
+			 
+			 - End devices: sensori o attuatori che mandano  messaggi wireless ad un gateways con modulazione LoRa o ricevono messaggi dagli stessi
+			 
+			 - Gateways: ricevono messaggi dagli End Devices e li inoltrano al Network Server 
+			 	
+			 	-Indoor Gateways (picocell): più convenienti, adatti a posti chiusi, hanno un'antenna interna o esterna
+			 	
+			 	-Outdoor Gateways (macrocell): raggio solitamente molto più ampio degli indoor, solitamente c'è un'antenna esterna collegata con cavo 
+			 				       coassiale
+			 
+			 - Application Server: software sul server che si assicura della sicurezza del processamento dei dati, genera anche i downlink 
+			 		       payloads (verso rete inferiore quindi) e tramite il Network Server li invia agli end devices connessi
+			 
+			 - Join Server: software sul server che tratta le richieste di join da dei end devices
+			 
+			 
+			 
+Network server ( in LoRaWAN ) --> The Network Server manages gateways, end-devices, applications, and users in the entire LoRaWAN network.
+
+				   A typical LoRaWAN Network Server has the following features:
+
+				    - Establishing secure 128-bit AES connections for the transport of messages between end-devices and the Application Server
+				    (end-to-end security).
+				    
+				    - Validating the authenticity of end devices and integrity of messages.
+				    
+				    - Deduplicating uplink messages.
+				    
+				    - Selecting the best gateway for routing downlink messages.
+				    
+				    - Sending ADR commands to optimize the data rate of devices.
+				    
+				    - Device address checking.
+				    
+				    - Providing acknowledgements of confirmed uplink data messages.
+				    
+				    - Forwarding uplink application payloads to the appropriate application servers
+				    
+				    - Routing uplink application payloads to the appropriate Application Server.
+				    
+				    - Forwarding Join-request and Join-accept messages between the devices and the join server
+				    
+				    - Responding to all MAC layer commands
+
+
+
+Limitazioni --> esistono precise limitazioni regionali ( in caso approfondire )
+
+
+LoRaWAN Relay --> i relay sono utili in situazioni in cui gli end devices e i gateways non riescono a comunicare direttamente causa distanza, l'hardware è simile a quello
+		  di un end devices. Ogni relay può servire fino a 16 end devices, per il network server il relay appare come un normale end devices.
+		  Funzionamento:
+		  Gli end devices e i relay conoscono a priori il canale di comunicazione su cui scambiarsi i dati.
+		  
+		  1. Un end devices invia un frame WOR (Wake on radio) 
+		  
+		  2. Questo frame "risveglia" il relay e condivide parametri radio ( come frequenza e data rate ) che verranno usati nel successivo frame uplink
+		  
+		  Se non c'è attivita radio il relay entra in una sleep mode dove rimane attivo a bassissimo consumo per scannerizzare periodicamente se sono presenti
+		  attività radio ( CAD o Channel Activity Detection ), questo scan può durare da 25ms a 1s; la durata tra due CAD si chiama CADPeriodicity. 
+		  Il preambolo di un frame WOR dura circa 1s, questo fa si che i frame siano facilmente rilevabili dalla CAD. 
+		  Se il relay rileva qualcosa passa dalla CAD alla Reception Mode, il tempo impiegato per cambiare modalità si chiama CADToRx delay.
+		  In questa modalità il relay de-modula il frame WOR, se l'operazione va a buon fine il relay manda un WOR-ACK all'end devices.
+		  Nel WOR-ACK sono presenti informazioni grazie alle quali l'end device si allinearsi su alcune cose con il relay; tra le info ci sono:
+		  
+		  - CadToRx - the time required to switch from CAD to the reception mode of WOR
+		  
+		  - Forward - indicates the current state of the relay forward limitations
+		  
+		  - RelayDataRate- the data rate used by the relay to forward the end device payload
+		  
+		  - XTALAccuracy - the crystal frequency accuracy of the relay clock
+		  
+		  - CADPeriodicity - the delay between two consecutive CAD scans performed by the relay on a single channel
+		  
+		  - TOffset - the time, in milliseconds, between the start of the scan and the end of the reception of the WOR frame preamble.
+		  
+		 Dopodichè il relay rimane in attesa del seguente frame LoRaWAN frame dall'end device. Dopo averlo ricevuto il relay aggiunge un campo al frame
+		 di 6 bytes. Il frame risultante si chiama Relay Uplink FRMPayload. Successivamente il relay crea un nuovo LoRaWAN frame inserendo il Relay Uplink
+		 FRMPayload nel suo payload. Questo frame viene poi mandato tramite gateways al Network Server 
+		 
+		 
+		 
+		 
+		 
+		 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+
+Device: Nell'IoT pezzo di equipaggiamento con la capacità di comunicare e eventualmente con la capacità di: sensing, actuation, datacapture, data storage and data processing.
+
+IoT: 
+Infrastruttura globale per la information society, fornisce servizi avanzati connettendo (fisicamente (per esempio device)  e virtualmente (per esempio rappresentazioni digitali di oggetti fisici)), è basato su tecnologie esistenti ed in evoluzione
+
+Una "thing" nell'IoT è un oggetto ,fisico o virtuale che può essere identificato e integrato in comunuication networks.
+
+L'IoT può essere visto in una visione a lungo-raggio con implicazioni sociali e tecnologiche. Sfruttando l'identificazione, il data capture, processing and communication capabilities, l'IoT fa un uso completo delle "things" per offrire servizi a ogni tipo di applicazione
+
+Physical things exist in the physical world and are capable of being sensed, actuated and connected.
+Examples of physical things include the surrounding environment, industrial robots, goods and
+electrical equipment.
+Virtual things exist in the information world and are capable of being stored, processed and
+accessed. Examples of virtual things include multimedia content and application software.
+A physical thing may be represented in the information world via one or more virtual things
+(mapping), but a virtual thing can also exist without any associated physical thing.
+
+Un device è un pezzo di equipaggiamento che obbligatoriamente ha capacità di comunicazione e opzionalente ha quelle di sensing, actuation, data capture, data storage and data processing. I devices collezzionano diversi tipi di informazione e le forniscono ai information e communication networks per ulteriori elaborazioni. Alcuni devices eseguono loro stessi delle operazioni basate sulle informazioni ricevute dai information e communication networks.
+
+I devices comunicano con altri devices tramite communication network via gateway o tramite communication network senza gateway o direttamente; è possibile anche una comunicazione ibrida tra questi casi
+
+Le applications IoT includono diversi tipi di applications, possono anche essere costruite su piattaforme di supporto di servizi/applications comuni che forniscono generiche enabling capabilities tipo authentication, device management, charging and accounting.
+
+Il communication networks trasferisce dati ottenuti dai devices alle applications e a altri devices, oltre che istruzioni dalle applications ai devices. Il communication network fornisce capacità per effettuaredata transfer sicuri ed efficienti e può essere realizzato tramite networks esistenti ( come networks convenzionali basati su TCP/IP o altri)
+
+I device possono essere di due tipi: data-carryng, data-capturing, sensing and actuating device e general device.
+
+
+Data-carrying device: A data-carrying device is attached to a physical thing to indirectly
+connect the physical thing with the communication networks.
+
+Data-capturing device: A data-capturing device refers to a reader/writer device with the
+capability to interact with physical things. The interaction can happen indirectly via
+data-carrying devices, or directly via data carriers attached to the physical things. In the
+first case, the data-capturing device reads information on a data-carrying device and can
+
+
+Sensing and actuating device: A sensing and actuating device may detect or measure
+information related to the surrounding environment and convert it into digital electronic
+signals. It may also convert digital electronic signals from the information networks into
+operations. Generally, sensing and actuating devices form local networks communicate
+with each other using wired or wireless communication technologies and use gateways to
+connect to the communication networks.
+
+General device: A general device has embedded processing and communication capabilities
+and may communicate with the communication networks via wired or wireless
+technologies. General devices include equipment and appliances for different IoT
+application domains, such as industrial machines, home electrical appliances and smart phones.
+
+Le caratteristiche fondamentali dell'IoT sono:
+–
+Interconnectivity: With regard to the IoT, anything can be interconnected with the global
+information and communication infrastructure.
+–
+Things-related services: The IoT is capable of providing thing-related services within the
+constraints of things, such as privacy protection and semantic consistency between physical
+things and their associated virtual things. In order to provide thing-related services within
+the constraints of things, both the technologies in physical world and information world
+will change.
+–
+Heterogeneity: The devices in the IoT are heterogeneous as based on different hardware
+platforms and networks. They can interact with other devices or service platforms through
+different networks.
+–
+Dynamic changes: The state of devices change dynamically, e.g., sleeping and waking up,
+connected and/or disconnected as well as the context of devices including location and
+speed. Moreover, the number of devices can change dynamically.
+–
+Enormous scale: The number of devices that need to be managed and that communicate
+with each other will be at least an order of magnitude larger than the devices connected to
+the current Internet. The ratio of communication triggered by devices as compared to
+communication triggered by humans will noticeably shift towards device-triggered
+communication. Even more critical will be the management of the data generated and their interpretation for application purposes. This relates to semantics of data, as well as efficient data handling.
+
+
+
+		 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+LPWAN: 
+Una low-power wide-area network è un tipo di network wirless a wide area creato per permettere comunicazioni a lungo raggio con un basso bit rate tra IoT devices:
+La differenza con un wireless WAN sta che un LPWAN è low power e low bit rate  mentre un wireless WAN usa più energia e porta più data. Il bit rate LPWAN ha un range tra gli 0.3 kbit/s e i 50 a canale.
+
+LPWAN (low-power, wide-area network) is a broad term encompassing various implementations and
+protocols both proprietary and open-source that share common characteristics:
+• Low power: Can operate on inexpensive batteries for long periods of time, e.g., 7 - 10 years
+• Wide area: Has an operating range that can exceed 2 km in urban environments
+
+Le tecnologie LPWAN funzionano bene in situazioni dove i devices devono mandare piccoli pacchetti di dati su un area moltogrande preservando la batteria.
+
+Nell'ambito dell'IoT ci sono 3 distinti segmenti di mercato basati sulla larghezza di banda:
+
+Larghezza di banda alta: per esempio LTE, GSM (cellulari) sono scelte che rientrano in questa categoria e vengono usate per grandi e affidabili data transfer o streaming video/audio in real-time.
+
+Media larghezza di banda: tipo WiFi o Zigbee, servono per esempio per smart home application 
+
+Bassa larghezza di banda: già detto sopra. esempi: sensor monitoring, remote metering, smart infrastructure, agricolture, asset tracking and enviroment monitoring.
+
+Immagine, sito: https://cdn.ai-forall.com/ifa_dev_media/Lo_Ra_Lo_Ra_WAN_Primer_1750b45f5a.pdf
+
+Nel mercato delle LPWAN, ci sono diversi standard in competizione: SigFox, Weightless, RPMA, UNB, and LoRa/LoRaWAN.
+
+LoRa è il physical layer del LPWAN technology stack. E' implementato in un chip proprietario fatto da Semtech e modula i segnali su un raggio lungo. Usa la tecnologia del chirp spread spectrum (CSS) che permette una comnuicazione robusta e low-power su una grande area.
+
+It is critical to understand that LoRa, by itself, does not make it an implementation of LPWAN technology.
+LoRa is simply the chip that enables modulation. To create a network, a media access control (MAC) layer
+is also required. The MAC layer associated with LoRa chips is called LoRaWAN, maintained by the LoRa
+Alliance. LoRa is sometimes used to refer to this entire protocol, but to differentiate Link Labs’ Symphony
+Link that uses a proprietary MAC layer on top of a LoRa chip, this document will take a strict definition of
+LoRa.
+In summary:
+• LoRa = PHY Layer
+• LoRaWAN = MAC Layer
+• LoRa + LoRaWAN = LPWAN
+
+LoRa è una tecnica di modulazione che utilizza la tecnologia CSS. I chips LoRa generano un chirp stabile usando un frac-N phase lock loop (PLL) (?), che è una variazione lineare di frequenza nel tempo. Grazie a questa linearità i receivers LoRa non sono affetti dal Doppler effect (?) e possono essere custruiti senza spendere toppo dato che non è necessario raggiungere un'accuratezza estrema per i frequency offsets.
+
+Compared to traditional frequency shift keying (FSK) and phase shift keying (PSK) modulation schemes, LoRa receivers have a higher out-of-channel selectivity and co-channel rejection of 90 dB and 20 dB respectively. LoRa can also demodulate several orthogonal signals at the same frequency if they have different chirp rates (spreading factors with higher spreading factors denoting slower chirps)
+
+Il LoRa chirp rate dipende solamente dalla larghezza di banda, di fatto il chirp rate è uguale alla larghezza di banda. Sapendo che un simbolo LoRa è codificato da 2S F Chirps (SF e log2 spreading factor) che coprono l'intera banda di frequenza, la relazione tra chirp rate e larghezza di banda comporta importanti conseguenze:
+
+1. Spreading factor is inversely proportional to the frequency span of a chirp and directly proportional to the duration of a symbol.
+2. Spreading factor does not affect the bit rate.
+3. Bit rate at a spreading factor is proportional to the frequency bandwidth
+
+LoRa also includes forward error correction code where the code rate is 4/(4+n) with n {1, 2, 3, 4}. So the useful bit rate is given by the following:
+BitRate = SF × BW⁄2^sf × Code Rate
+In general, receiver sensitivity increases with spreading factor and decreases with more bandwidth. So the theoretical receiver sensitivity per spreading factor and bandwidth are tabulated as following from the SX1276 datasheet
+
+LoRa utilizza una struttura specifica per trasmettere physical frames:
+1. Ogni mess inizia con nu preambolo dove gli up-chirps coprono l'intera frequenza di banda e codifica una sync word. Questa differenzia un LoRa network da altri nella stessa banda di frequenza
+
+2. L'header opzionale fornisce la grandezza del payload, code rate e la presenza del payload CRC
+
+3.Payload e CRC opzionale seguono l'header.
+
+LPWANs target the deployment of Gateways (GWs) operat-
+ing as access points, to support End Devices (EDs) operating
+as sensors (for gathering data of interest) and/or as actuators
+(for performing an action). As such, LPWANs can be con-
+sidered as a type of Wireless Sensor and Actuator Networks
+(WSANs) [9]. From the application perspective, LPWANs
+support applications with low-rate requirements, which implies
+low energy demands for the EDs (they can remain operational
+in the field, with no battery charging or replacement, for
+long periods -a few years-) [10]. Also, from the deployment
+perspective, wide areas are covered with a small amount of
+GWs (due to the long-range type of wireless links). These
+characteristics (low energy demands and long-range support)
+make LPWANs a cost-effective solution for IoT.
+
+These characteristics (low energy demands and long-range support)
+make LPWANs a cost-effective solution for IoT.
+The scope of this paper is to present LPWANs as major can-
+didates for the support of the IoT ecosystem, by decomposing
+various related technologies and revealing research challenges
+and directions. To this end, extra focus is given to the
+Long Range (LoRa)/LoRa Wide Area Network (LoRaWAN)
+systems, which appear to be a prominent solution for wireless
+access over unlicensed spectrum
+
+
+LPWANs define a wireless network family, which can be
+considered as part of the third generation of IoT networking,
+where the focus is the provisioning of cloud services to con-
+nected things [28]. Fig.2 compares the key wireless technology
+families in terms of data rate, range, and power consumption.
+Clearly, the LPWAN technologies are the winners in terms of
+range and power consumptio
+
+
+The following are well-established LPWAN technologies:
+Extended Coverage-Global System for Mobile
+communications-IoT (EC-GSM-IoT), Long Term Evolution-
+Machine type communication (LTE-M), Narrowband-IoT
+(NB-IoT), MY IoT (MIOTY), Random Phase Multiple
+Access (RPMA), Weightless, Wize, Sigfox, and LoRa. The
+first three technologies (i.e., EC-GSM-IoT, LTE-M, and
+NB-IoT) have been defined by the 3rd Generation Partnership
+Project (3GPP) and are referred to as Cellular IoT (CIoT)
+technologies, whereas the rest have not been standardized by
+3GPP. This criterion also splits the technologies into those
+that use the licensed part of the spectrum (3GPP technologies) and those that operate in the license-free spectrum (non-3GPP
+technologies)
+
+
+From an architectural perspective, LPWANs are composed
+of five types of nodes: the EDs and the GWs, which com-
+pose the access-side, and the Network Gateway, the LPWAN
+Authentication, Authorization, and Accounting (AAA) Server,
+and the Application Server, which compose the server-side.
+EDs are deployed in massive numbers and tend to broadcast
+their messages in the hope of being received by a GW that
+covers the area. GWs forward these messages to the server-
+side, where numerous functions at the network and application
+layers take place. At the server-side, the Network Gateway
+receives this transmitted information and either performs in-
+ternal processing or re-distributes the information to the rest
+of the interested parties, i.e., the LPWAN AAA Server and
+the Application Server. Existence of the LPWAN AAA Server
+and the Application Server is optional, because the Network
+Gateway may be able to handle all the necessary server-side
+functionality. Nevertheless, common practices dictate the use
+of dedicated servers for the different functionalities and types
+of messages, e.g., an LPWAN AAA Server may authorize spe-
+cific EDs to participate in the network, whereas an Application
+Server may be the bridging point between internal server-
+side application data and external application end user. A
+growing trend in server-side implementations is the utilization
+of a cloud infrastructure. Although the nomenclature and the
+full node deployment might be different from one technology
+to another, an LPWAN system architecture can be usually
+described by a structure similar to the one depicte
+
+In the server/control-side of LPWANs, various software
+components are expected (e.g., Network Gateway, Application
+Server, LPWAN AAA Server). Recently the development of
+such software is efficiently supported by open-source so-
+lutions. Practically, a network operator can integrate code
+snippets and stacks that are available in public software
+repositories ([31], [32], [33], [34], [35], [36], [37], [38]).
+Similarly, a service provider can follow the cloud paradigm,
+which offers flexible billing options, either via a fixed billing
+plan or via a pay-as-you-go model. Cloud computing refers to
+the offering of virtualized computing resources, with several
+cloud models in existence
+
+
+CSS: 
+LoRa is an implementation of CSS19, which is a member of
+the Spread Spectrum (SS) family [217]. SS modulations spread
+the signal over a wider BW, achieving better performance
+in terms of intentional interference (jamming), unintentional
+interference, and intentional detection of signals intended for
+others (eavesdropping) [218]. Several SS approaches have
+been proposed over the years, with Direct Sequence SS
+(DSSS) and Frequency Hopping SS (FHSS) being the main
+representatives. Other methods include Time Hopping SS
+(THSS) and Hybrid SS (HSS). LoRa CSS implementation is
+considered as a DSSS alternative [118].
+In this context, the desired signal (which is a sequence of
+bits) is transformed to a sequence of pulses using a code. The
+code is a pseudorandom sequence composed of pulses, which
+are also called chips. Hence, the chip rate of a code is the
+number of pulses per second (chips per second) at which the
+signal is transmitted (or received). Practically, the chip rate,
+𝑅𝑐, equals the spread BW, 𝐵𝑊, so:
+𝑅𝑐 = 𝐵𝑊 (A1)
+For the actual transmission, a sequence of symbols is sent.
+The symbols are defined as the different ways to apply a sweep
+of the signal (a.k.a. chirp) within the available BW
+The number of chips that are used per symbol is a quantity
+derived by the SF and equals to 2𝑆𝐹 . Given that, the symbol
+or chirp rate, 𝑅𝑠 , is calculated by the division of the chip rate
+by the number of chips used in a chirp, thus:
+𝑅𝑠 = 𝑅𝑐
+2𝑆𝐹 (A2)
+The reciprocal of rate is duration, so we can also derive the
+duration of the chip and the chirp (𝑇𝑐 and 𝑇𝑠 , respectively) as:
+𝑇𝑐 = 1
+𝑅𝑐
+= 1
+𝐵𝑊 (A3)
+𝑇𝑠 = 1
+𝑅𝑠
+= 2𝑆𝐹
+𝐵𝑊 (A4)
+For the calculation of the bit rate, we multiply the number
+of bits that are represented in a symbol (or chirp) with the
+symbol rate. Again, the number of bits that a symbol represents
+is derived by the SF and actually equals the value of the 𝑆𝐹
+that is used in the link.
+𝑅𝑏 = 𝑆𝐹 ∗ 𝑅
+
+Nevertheless, the bit rate in LoRa is slightly lower than that,
+due to the inclusion of a FEC scheme. LoRa defines a four-
+value Rate Code, picking an element from the set { 4
+5 , 4
+6 , 4
+7 , 4
+8 }.
+𝑅𝑎𝑡𝑒𝐶𝑜𝑑𝑒 is a fraction that has as a nominator the amount
+of useful information of a message and as a denominator the
+total number of bits, i.e., information bits plus redundant bits
+for error correction. Given the FEC scheme, the bit rate in
+LoRa is as follows (which is actually the equation 1 provided
+in Section X):
+𝑅𝑏 = 𝑆𝐹 ∗ 𝐵𝑊
+2𝑆𝐹 ∗ 𝑅𝑎𝑡𝑒𝐶𝑜𝑑𝑒
+
+
+LoRa è una proprietary spread spectrum modulation scheme derivata da CSS che può sacrificare data rate per la sensitività con una larghezza di banda del canale fissa.
+Cambiando Spreading Factors è possibile cambiare il data rate, ogni SF è indipendente dagli altri (ortogonale) quindi è possibile trasmettere nello stesso canale senza interferire tra loro. Il progettista può decidere se privilegiare portata o batteria a scapito della velocità.
+
+LoRa e una implementazione del Phy layer ed è agnostica (interoperabile) con implementazioni in layer più alti, ciò permette a LoRa di coesistere e operare con architetture network già esistenti
+
+In information theory, the Shannon–Hartley theorem states the maximum rate at which information can
+be transmitted over a communications channel of a specified bandwidth in the presence of noise.
+The theorem establishes Shannon's channel capacity for a communication link and defines the
+maximum data rate (information) that can be transmitted within a specified bandwidth in the presence
+of noise interference:
+   ∗   Equation 1
+Where:
+C = channel capacity (bit/s)
+B = channel bandwidth (Hz)
+S = average received signal power (Watts)
+N = average noise or interference power (Watts)
+S/N = signal to noise ratio (SNR) expressed as a linear power ratio
+By rearranging Equation 1 from log base 2 to the natural log, e, and by noting that ln   we can
+manipulate the equation as follows:
+
+  .  ∗ Equation 2
+For spread spectrum applications the signal to noise ratio is small, since the signal power is often below
+the noise floor. Assuming a noise level such that S/N << 1, Equation 2 can be re-written as:
+
+  
+
+Or:
+ 
+ Equation 3
+From equation 3 it can be seen that to transmit error free information in a channel of fixed noise-to-
+signal ratio, only the transmitted signal bandwidth need be increased.
+
+As has been noted above, by increasing the bandwidth of the signal we can compensate for the
+degradation of the signal-to-noise (or noise-to-signal) ratio of a radio channel.
+In traditional Direct Sequence Spread Spectrum (DSSS) systems, the carrier phase of the transmitter
+changes in accordance with a code sequence. This process is generally achieved by multiplying the
+wanted data signal with a spreading code, also known as a chip sequence. The chip sequence occurs at a
+much faster rate than the data signal and thus spreads the signal bandwidth beyond the original
+bandwidth occupied by just the original signal. Note that the term chip is used to distinguish the shorter
+coded bits from the longer un-coded bits of the information signal.
+
+IMMAGINE
+
+At the receiver, the wanted data signal is recovered by re-multiplying with a locally generated replica of
+the spreading sequence. This multiplication process in the receiver effectively compresses the spread
+signal back to its original un-spread bandwidth, as illustrated below in
+Figure 2. It should be noted that the same chip sequence or code must be used in the receiver as in the
+transmitter to correctly recover the information.
+
+IMMAGINE
+
+The amount of spreading, for direct sequence, is dependent on the ratio of "chips per bit" - the ratio of
+the chip sequence to the wanted data rate, is referred to as the processing gain (Gp), commonly
+expressed in dB.
+  10 ∗ "#
+$%
+$&
+ '()*
+Where:
+RC = chip rate (Chips/second)
+Rb = bit-rate (bits/second
+As well as providing inherent processing gain for the wanted transmission (which enables the receiver to
+correctly recover the data signal even when the SNR of the channel is a negative value); interfering
+signals are also reduced by the process gain of the receiver. These are spread beyond the desired
+information bandwidth and can be easily removed by filtering.
+DSSS is widely used in data communication applications. However, challenges exist for low-cost or
+power-constrained devices and networks.
+Often, as is the case with GPS or the DSSS PHY of IEEE Standard 802.15.4k, the system will require a
+highly accurate and expensive reference clock source. In addition, the longer the spreading code or
+sequence, the longer the time required by the receiver to perform a correlation over the entire length ofè 
+
+
+
+username: [REDACTED]
+password [REDACTED]
+
+
+
+
+dns: 192.168.17.1 
+se ip cambiano queri al DNS, device: LoRa 0 e LoRa 1
+192.168.17.130
+192.168.17.19
+
+
+
+Step 1: applicazione client-servere tra due device, no gateway quindi connessione punto punto di tipo RTT.
+Step 2: Client-server bidirezionale
+Step 3: simulare drop pacchetti, cambiare SF, ecc
+Step 4: Creare un protocollo anche smeplice che si comporti come TCP/IP, materiale anche su google scholar.  

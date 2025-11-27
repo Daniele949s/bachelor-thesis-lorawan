@@ -1,0 +1,14 @@
+\section{\gls{clues}}
+
+Solitamente i dispositivi che utilizzano LoRa hanno una distribuzione centralizzata, sostenuta da municipalità o entità private, che crea servizi che eventualmente espongono dati a cittadini o investitori. Questo comporta difficoltà sostanziali per nuove iniziative, la combinazione di:
+
+\begin{itemize}
+    \item Investimento iniziale elevato
+    \item Prospettive di reddito incerte
+    \item Complessità di navigazione in un ecosistema frammentato
+\end{itemize}
+Rendono la monetizzazione difficile, scoraggiando nuovi investitori a investire.
+
+Una soluzione possibile può essere realizzata tramite lo \gls{shg}, che si comporta come un ponte tra sensori fisici, \gls{shome} e città.
+Lo \gls{shg} rappresenta un'architettura, chiamata \gls{clues}, che permette di interfacciare dati locali con servizi interni ed esterni, permettendo la creazione di servizi scalabili e di valore per la comunità. Questa architettura permette quindi un paradigma decentralizzato, distribuendo le responsabilità di gestione di rete e dei dati a una rete di \gls{shg}; mentre in altri modelli partecipatori di LoRaWAN il \gls{gw} si comporta solamente da "tramite" di pacchetti e si appoggia ad una struttura backend centralizzata \parencite{Aimi2025CLUES}.
+\gls{clues} è perciò un ottimo esempio di possibile miglioramento in scalabilità e gestione della rete

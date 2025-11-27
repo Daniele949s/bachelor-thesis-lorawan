@@ -1,0 +1,1304 @@
+\documentclass[a4paper, 12pt]{report}
+
+\usepackage{graphicx} % Required for inserting images
+\graphicspath{ {figures/} }
+\renewcommand{\listfigurename}{Immagini}
+
+\usepackage{glossaries}
+%\usepackage[hidelinks]{hyperref}
+
+
+\usepackage{titlesec}
+\titleformat{\paragraph}
+  {\normalfont\normalsize\bfseries}{\theparagraph}{1em}{}
+\titleformat{\subparagraph}
+  {\normalfont\normalsize\bfseries}{\thesubparagraph}{1em}{}
+
+\usepackage{float}
+
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage{parskip}
+\usepackage[T1]{fontenc}
+\usepackage[italian]{babel}
+\usepackage{setspace}
+
+\usepackage{longtable}
+\usepackage{booktabs} 
+\usepackage{array}    
+
+\usepackage{csquotes}
+\usepackage[
+    backend=biber, 
+    style=authoryear,  
+    sorting=nyt
+]{biblatex}
+\addbibresource{biblio.bib}
+
+\setcounter{tocdepth}{4}
+\setcounter{secnumdepth}{4}
+
+
+\makeglossaries
+
+
+\title{Riassunto LoRa}
+\author{Daniele Maccagnan}
+\date{July 2025}
+
+\newacronym{pps}{PPS}{Packet per Second}
+\newacronym{rtt}{RTT}{Round Trip Time}
+\newacronym{iot}{IoT}{Internet of Things}
+\newacronym{lpwan}{LPWAN}{Low-Power Wide-Area Network}
+\newacronym{css}{CSS}{Chirp Spread Spectrum}
+\newacronym{dsss}{DSSS}{Direct Sequence Spread Spectrum}
+\newacronym{fhss}{FHSS}{Frequency Hopping Spread Spectrum}
+\newacronym{imt}{IMT-2020}{International Mobile Telecommunications-2020}
+\newacronym{aaa}{AAA}{Autenticazione, Autorizzazione, Accounting}
+\newacronym{phy}{PHY}{Livello fisico}
+\newacronym{mac}{MAC}{Livello MAC}
+\newacronym{fsk}{FSK}{Frequency Shift Keying}
+\newacronym{enddev}{ED}{End-Devices}
+\newacronym{netser}{NS}{Network Server}
+\newacronym{appser}{AS}{Application Server}
+\newacronym{joinser}{JS}{Join Server}
+\newacronym{wor}{WOR}{Wake On Radio}
+\newacronym{cad}{CAD}{Channel Activity Detection}
+\newacronym{rx}{RX}{Receive Window}
+\newacronym{mic}{MIC}{Message Integrity Code}
+\newacronym{jreq}{Join\_Request}{Join\_request}
+\newacronym{rjreq}{Re\_Join\_Request}{Re\_Join\_request}
+\newacronym{jacc}{Join\_Accept}{Join\_Accept}
+\newacronym{ota}{OTA}{Over-The-Air}
+\newacronym{otaa}{OTAA}{Over-The-Air Activation}
+\newacronym{tx}{Tx}{Potenza di trasmissione}
+\newacronym{adr}{ADR}{Adaptive Data Rate}
+\newacronym{abp}{ABP}{Activation By Personalization}
+\newacronym{cid}{CID}{Command Identifier}
+\newacronym{nwk}{NWK}{NwkKey}
+\newacronym{appk}{APPK}{AppKey}
+\newacronym{appsk}{APPSK}{AppSKey}
+\newacronym{fnwk}{FNWK}{FNwkSIntKey}
+\newacronym{snwk}{SNWK}{SNwkSIntKey}
+\newacronym{nwks}{NWKS}{NwkSEncKey}
+\newacronym{rfu}{RFU}{Reserved For Future}
+\newacronym{rsl}{RS}{Reception Slot}
+\newacronym{clues}{CLUES}{Community-driven LoRa networks Urban sensing Empowered by Smart homes}
+\newacronym{gw}{GW}{Gateway}
+\newacronym{shg}{SHG}{Smart Home Gateway}
+\newacronym{p2p}{P2P}{point-to-point}
+\newacronym{sig}{SIG}{Weightless Special Interest Group}
+\newacronym{tvws}{TVWS}{TV White Space}
+\newacronym{vpn}{VPN}{Virtual Private Network}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\newglossaryentry{linkbudget}{
+  name={Link Budget},
+  description={Calcolo che tiene conto di tutti i guadagni e le perdite di potenza di un segnale in un sistema di comunicazione. Meglio noto come 'Link Budget'.}
+}
+\newglossaryentry{informationsociety}{
+  name={Società dell'Informazione},
+  description={Modello di società in cui la creazione, elaborazione e scambio di informazioni sono gli elementi centrali dell’attività economica, sociale e tecnologica}
+}
+\newglossaryentry{communicationnetworks}{
+  name={Reti di comunicazione},
+  description={Infrastruttura fisica e logica e ai protocolli usati per il trasferimento dei dati }
+}
+\newglossaryentry{informationnetworks}{
+  name={Reti di informazione},
+  description={Struttura gestione e contenuto dell'informazione stessa}
+}
+\newglossaryentry{datarate}{
+  name={data rate},
+  description={Quantità di dati trasmessi o elaborati nel tempo, si misura in bit al secondo o in suoi multipli}
+}
+\newglossaryentry{spreadingfactor}{
+  name={Spreading Factor},
+  description={Parametro che controlla il chirp rate e di conseguenza anche la velocità di trasmissione dei dati}
+}
+\newglossaryentry{multipath}{
+  name={multipath},
+  description={Fenomeno che si verifica quando un segnale per arrivare dal mittente al ricevitore viaggia su 2 o più percorsi diversi}
+}
+\newglossaryentry{fading}{
+  name={fading},
+  description={Degradazione della potenza del segnale ricevuto}
+}
+\newglossaryentry{dopplereffect}{
+  name={Effetto Doppler},
+  description={Fenomeno che si verifica quando la frequenza di un onda ricevuta cambia per colpa del movimento del mittente relativamente al ricevitore}
+}
+\newglossaryentry{sensitività}{
+  name={sensitività},
+  description={Minima potenza del segnale ricevuto che un ricevitore è in grado di rilevare e decodificare correttamente}
+}
+\newglossaryentry{dlk}{
+  name={downlink},
+  description={Network Server - Gateway - End-Device }
+}
+\newglossaryentry{ulk}{
+  name={uplink},
+  description={End-Device - Gateway - Network Server}
+}
+\newglossaryentry{dutycyc}{
+  name={Duty Cycle},
+  description={Rapporto tra tempo in cui un segnale o un dispositivo è attivo e il tempo totale del ciclo}
+}
+\newglossaryentry{freqhop}{
+  name={Frequency Hopping},
+  description={Tecnica di comunicazione radio dove la frequenza portante viene cambiata in maniera pseudo-casuale}
+}
+\newglossaryentry{glid}{
+  name={id globale nell'IEE EUI64 address space},
+  description={campo di tot bit all'interno dell'indirizzo EUI64 che indica l'origine dell'indirizzo stesso}
+}
+\newglossaryentry{aes128}{
+  name={AES-128 root keys},
+  description={chiavi pre-condivise utilizzate per derivare tutte le session keys}
+}
+\newglossaryentry{seskey}{
+  name={session key},
+  description={chiave crittografica temporanea utilizzata per proteggere la comunicazione durante una singola sessione tra due parti}
+  }
+\newglossaryentry{shome}{
+  name={Smart Home},
+  description={Una Smart Home è una residenza fornita di dispositivi connessi alla rete che possono essere monitorati e controllati da remoto}
+  }
+
+
+
+\begin{document}
+
+\onehalfspacing
+
+\begin{titlepage}
+    \begin{center} 
+    
+        \LARGE 
+        \textbf{UNIVERSITÀ DEGLI STUDI DI BOLOGNA} \\
+        \vspace{0.1 cm} 
+        \LARGE 
+        SCUOLA DI INGEGNERIA E ARCHITETTURA \\
+        
+        \vspace{1.5 cm} 
+
+        \Large 
+        Corso di Laurea in Ingegneria Informatica \\
+        \textit{Dipartimento di Informatica - Scienza e Ingegneria} \\
+
+        \vspace{1.5 cm}
+        
+        \Large
+        TESI DI LAUREA\\
+        in\\
+        Reti di Calcolatori\\
+        
+        \vfill 
+
+        \Huge 
+        \textbf{Architetture LoRa e LoRaWAN: utilizzo e performance} \\ 
+        
+        \vfill 
+
+    \end{center}
+
+    \noindent 
+    \begin{minipage}[t]{0.4\textwidth} 
+        \flushleft 
+        \large 
+        \textbf{Tesi di Laurea di:} \\
+        \Large
+        Daniele Maccagnan
+    \end{minipage}
+    \hfill 
+    \begin{minipage}[t]{0.4\textwidth} 
+        \flushright 
+        \large
+        \textbf{Relatore:} \\
+        \Large
+        Chiar.mo Prof. Ing. Antonio Corradi
+        \large
+        \textbf{Correlatore:} \\
+        \Large
+        Dott. Ing. Andrea Sabbioni
+    \end{minipage}
+    
+    \vspace{2 cm} 
+
+    \begin{center}
+        \large
+        \textbf{Anno Accademico 2024 - 2025}
+    \end{center}
+\end{titlepage}
+\tableofcontents
+
+
+\chapter*{Introduzione}
+\addcontentsline{toc}{chapter}{Introduzione}
+
+In questo momento storico le reti \gls{lpwan} stanno assumendo un ruolo sempre più importante nelle comunicazioni mondiali, dato che le tecnologie già esistenti, come Wi-Fi o Zigbee, non sono progettate per supportare dispositivi che necessitano di comunicare a lunghe distanze e per lungo tempo. Tra le varie tecnologie che rientrano in questa categoria LoRa/LoRaWAN è tra le più avanzate e utilizzate. L'obiettivo di questa tesi è quindi di descrivere il funzionamento di questo protocollo di rete, evidenziandone vantaggi e difetti. 
+
+In questo testo partiremo perciò nel \textbf{Capitolo 1} con l'introduzione dell'\gls{iot} e delle reti \gls{lpwan}.
+Dopodiché nel \textbf{Capitolo 2} approfondiremo il funzionamento di LoRa per introdurre così la descrizione dell'architettura e del funzionamento di LoRa/LoRaWAN nel \textbf{Capitolo 3}. Nei \textbf{Capitoli 4-5-6} parleremo poi delle diverse classi di dispositivi per le reti LoRa/LoRaWAN, arrivando al \textbf{Capitolo 7} dove verranno descritti dei test di comunicazione \gls{p2p} tra due dispositivi forniti di chip LoRa. Infine nel \textbf{Capitolo 8} verranno trattati possibili sviluppi futuri di LoRa e LoRaWAN.
+
+
+\chapter{Internet of Things}
+
+\section{Panoramica sull'\gls{iot}}
+
+L'\gls{iot} è un'infrastruttura globale per la \gls{informationsociety}. Fornisce servizi avanzati interconnettendo degli oggetti (fisici o virtuali) basandosi su tecnologie della comunicazione e dell'informazione già esistenti e in evoluzione \parencite{ITU-T, Milarokostas2023}.
+Le caratteristiche fondamentali dell'\gls{iot} sono:
+\begin{itemize}
+    \item Interconnettività: nell'ambito dell'\gls{iot} tutto può essere interconnesso grazie all'infrastruttura globale di informazione e comunicazione
+    \item Servizi riferiti agli oggetti: l'\gls{iot} ha la capacità di fornire servizi agli oggetti nei limiti degli oggetti stessi. Esempi di servizi sono: protezione della privacy e coerenza semantica tra oggetti fisici e i loro oggetti virtuali associati
+    \item Eterogeneità: i dispositivi sono eterogenei essendo basati su differenti piattaforme hardware e reti. Possono interagire con altri dispositivi o piattaforme di servizi tramite reti diverse.
+    \item Cambiamenti dinamici: lo stato dei dispositivi cambia dinamicamente, per esempio: da dormiente ad attivo, connesso o disconnesso o anche luogo o velocità. Anche il numero stesso dei dispositivi può cambiare dinamicamente
+    \item Scala di diffusione enorme: Il numero di dispositivi che necessitano di essere gestiti e di comunicare tra loro è almeno di un ordine di grandezza superiore ai dispositivi connessi all'internet corrente. La proporzione di comunicazioni attivate da dispositivi e da umani scorrerà visibilmente verso attivazioni da parte dei dispositivi.
+\end{itemize}
+
+
+Nell'ambito dell'\gls{iot} un oggetto ("thing") può essere fisico o virtuale e ha come caratteristica fondamentale il poter essere identificato e integrato nelle \gls{communicationnetworks}. Esempi di oggetti fisici sono: ambiente circostante, robot industriali o equipaggiamento elettrico mentre per gli oggetti virtuali: contenuti multimediali o applicazioni software. 
+Un oggetto fisico può anche essere rappresentato da uno o più oggetti virtuali, ma ciò non implica che un oggetto virtuale necessiti di un oggetto fisico per esistere: oggetti virtuali possono esistere anche senza nessun oggetto fisico associato.
+
+Un dispositivo è invece un pezzo di equipaggiamento con la capacità fondamentale di comunicare ed eventualmente con le capacità di:
+\begin{itemize}
+    \item rilevamento
+    \item attuazione
+    \item acquisizione dei dati
+    \item memorizzazione dei dati
+    \item elaborazione dei dati
+\end{itemize}
+I dispositivi collezionano diversi tipi di informazione, che forniscono successivamente alle \gls{informationnetworks} e alle \gls{communicationnetworks} per ulteriori elaborazioni. Esistono anche dispositivi che eseguono loro stessi delle operazioni su informazioni ricevute da suddette reti.
+La comunicazione tra loro avviene in 3 modi distinti (o anche in maniera ibrida):
+\begin{enumerate}
+    \item Tramite le \gls{communicationnetworks} e un \gls{gw}
+    \item Tramite le \gls{communicationnetworks} ma senza \gls{gw}
+    \item Tramite comunicazione diretta
+\end{enumerate}
+I dispositivi inoltre possono essere di più tipi
+\begin{enumerate}
+    \item Data carrying: dispositivi attaccati a un oggetto fisico per connetterlo indirettamente alle \gls{communicationnetworks}
+    \item Data capturing: sono dispositivi di lettura/scrittura con la capacità di interagire con oggetti fisici. L'interazione può avvenire indirettamente tramite dispositivi di data-carrying o direttamente tramite data carriers attaccati all'oggetto fisico. Nel primo caso leggono informazioni dal dispositivo di data-carrying e eventualmente possono scrivere informazioni ricevute dalle \gls{communicationnetworks}
+    \item Sensing e actuating: un dispositivo di sensing e actuating può rilevare e misurare informazioni inerenti all'ambiente circostante e convertirle in segnali elettronici digitali. Può anche convertire segnali elettronici digitali provenienti dalle \gls{informationnetworks} in operazioni. Generalmente questi dispositivi comunicano tra loro tramite connessioni via cavo o wireless e usano \gls{gw}s per connettersi alle \gls{communicationnetworks}
+    \item General device: un dispositivo general ha capacità di elaborazione e comunicazione, e potrebbe comunicare con le \gls{communicationnetworks} via cavo o con tecnologie wireless. Include inoltre equipaggiamento e apparecchi inerenti a diversi domini dell'\gls{iot}, come: macchine industriali, elettrodomestici e smartphone
+\end{enumerate}
+
+Lo sviluppo dell'\gls{iot} è tra i principali obiettivi attuali nel mondo, come dimostrano i numerosi tentativi di standardizzazione e ricerca condotti. Avrà quindi nel lungo periodo importanti implicazioni sociali e tecnologiche, stime recenti (“Internet of Things,” Cisco, San Jose, CA, USA, Tech. Rep., 2016) prevedono che entro la fine del 2030 ci saranno circa 500 miliardi di dispositivi \parencite{ITU-T, Milarokostas2023}.
+Uno degli obiettivi primari dei network post-2020 è quello di interconnettere numerosi dispositivi per supportare nuove applicazioni con requisiti eterogenei. Questo obiettivo è stato descritto dall'\gls{imt} report (requisiti emessi dal settore delle radiocomunicazioni ITU dell'Unione internazionale delle telecomunicazioni nel 2015 per reti, dispositivi e servizi 5G) come uno dei 3 scenari più esigenti dell'era del 5G \parencite{ITU-T, Milarokostas2023}. Visto il grande aumento previsto dei dispositivi è necessario potenziare le reti per interconnetterli tutti. Sono stati sviluppati perciò 2 principali approcci al problema: da una parte l'evoluzione delle reti mobile e delle reti LAN verso l'inclusione tra i loro servizi di comunicazioni \gls{iot}, dall'altra l'aumento di reti dedicate al supporto dei servizi \gls{iot}. 
+
+Possiamo distinguere i principali esponenti del secondo approccio in base alla larghezza di banda:
+\begin{itemize}
+    \item Grande larghezza di banda: ad esempio LTE e GSM (reti mobile), utilizzate soprattutto per grandi trasferimenti di dati con una certa affidabilità oppure per streaming di video o audio
+    \item Media larghezza di banda: ad esempio WiFi o Zigbee, utilizzate soprattutto per applicazioni nelle smart home
+    \item Piccola larghezza di banda: ad esempio le \gls{lpwan}, utilizzate soprattutto per monitoraggio dei sensori, misurazione remota, infrastrutture intelligenti, agricoltura, tracciamento delle risorse e monitoraggio ambientale
+\end{itemize}
+
+\section{Reti \gls{lpwan}}
+
+\gls{lpwan} è quindi un termine che raggruppa diverse reti wireless con delle caratteristiche comuni \parencite{ITU-T, Milarokostas2023}:
+\begin{itemize}
+    \item Basso consumo: è possibile operare su batterie non dispendiose per un lungo periodo
+    \item Lungo raggio: il raggio operativo può superare anche i 2km in ambienti urbani
+\end{itemize}
+
+Rappresentano quindi un compromesso tra: basso consumo, range elevato e basso \gls{datarate}.
+Generalmente una \gls{lpwan} è un tipo di rete wireless dove vengono distribuiti dei \gls{gw}s che operano come punti di accesso per supportare degli \gls{enddev} che operano come sensori o attuatori. Sfruttando tecnologie di comunicazione a lungo raggio sono sufficienti pochi \gls{gw}s per coprire vaste aree.
+Le applicazioni supportate da queste reti richiedono un basso bit-rate (il range va da 0.3 kbit/s 50 kbit/s), il che implica un basso consumo energetico. 
+
+L'architettura delle \gls{lpwan} è composta da 5 nodi, suddivisi solitamente in due lati:
+\begin{itemize}
+    \item \gls{enddev} e \gls{gw}s che compongono il lato di accesso
+    \item \gls{netser} e, opzionalmente, \gls{lpwan} \gls{aaa} Server e \gls{appser} che compongono il lato server \parencite{ITU-T, Milarokostas2023}
+\end{itemize}
+ Generalmente gli \gls{enddev} sono distribuiti in grande numero e mandano in broadcast i loro messaggi, sperando che un \gls{gw}s li riceva. I \gls{gw}s a questo punto inoltrano il messaggio al lato server dove avvengono numerose operazioni al livello di rete e di applicazione. Al lato server il \gls{netser} riceve queste informazioni e o le elabora internamente o le ridistribuisce al resto delle parti interessate.
+
+\subsection{Confronto di diverse \gls{lpwan} in commercio}
+
+Alcuni esempi di \gls{lpwan} sul mercato sono: SigFox, Weightless, RPMA e LoRa/LoRaWAN \parencite{ITU-T, Milarokostas2023}. 
+
+\subsubsection{RPMA}
+
+RPMA è una rete che sfrutta la modulazione \gls{dsss}. In questa rete la trasmissione degli \gls{enddev} viene pseudo-randomicamente ritardata per minimizzare interferenze e rumore sul canale di comunicazione. Contrariamente a altre reti \gls{lpwan} che utilizzano bande sotto il GHz, RPMA usa la banda 2.4GHz (la stessa utilizzata dal Wi-Fi).
+Nonostante questo però si comporta molto bene in termini di copertura grazie ad un \gls{linkbudget} molto elevato. Invece per risolvere il problema delle interferenze legato al grande utilizzo della sua banda utilizza piccoli canali in mezzo a quelli del Wi-Fi.
+Un altro vantaggio di RPMA è una solida sicurezza, offrendo quindi una forte protezione della privacy.
+
+\subsubsection{Weightless}
+
+Lo \gls{sig} ha sviluppato tre diverse reti \gls{lpwan}:
+\begin{itemize}
+    \item Weightless -W opera nel \gls{tvws}, il che complica la distribuzione viste le differenti specifiche regionali che regolano lo spettro \gls{tvws}
+    \item Weightless -N opera in bande senza licenza sotto il GHz, sembra essere promettente viste le somiglianze con SigFox (una delle \gls{lpwan} più popolari
+    \item Weightless -P supporta comunicazioni bidirezionali con una logica di ACK completa, offrendo quindi un certo QoS.
+\end{itemize}
+
+\subsubsection{SigFox}
+
+Sviluppata dalla compagnia omonima, SigFox è una delle \gls{lpwan} più diffuse. Mentre permette a produttori esterni di produrre e vendere \gls{enddev}, il lato server è fornito esclusivamente da SigFox e SigFox Cloud. Gli \gls{enddev}, sfruttando una tecnologia di comunicazione di SigFox, comunicano con delle Base Station, che a loro volta inoltrano il messaggio al SigFox Cloud. Questa connessione usa una \gls{vpn} e avviene tramite connessione via cavo, utilizzando come soluzione di backup le reti cellulari. SigFox definisce inoltre quattro differenti classi per gli \gls{enddev}. 
+Gli \gls{enddev} per comunicare scelgono tre canali in maniera pseudo-casuale per trasmettere il messaggio tre volte in tre diverse frequenze, in questo modo riescono a garantire un certo QoS.
+
+\subsubsection{LoRa/LoRaWAN}
+
+LoRa/LoRaWAN rappresenta la soluzione più diffusa per le \gls{lpwan} su spettro non licenziato. A differenza delle altre reti ha un livello \gls{phy} proprietario (LoRa) ed è uno standard aperto, il che ha permesso la creazione di un vasto ecosistema di produttori hardware.
+
+Vista la sua grande importanza la sua architettura e il suo funzionamento verranno trattati in maniera approfondita nei prossimi capitoli.
+
+
+\chapter{Tecnologia LoRa}
+
+La \gls{lpwan} LoRa/LoRaWAN si basa sulla tecnologia di modulazione LoRa per scambiare messaggi a livello \gls{phy}. 
+LoRa è stata sviluppata dalla compagnia Cycleo, fondata da 3 ragazzi in Francia nel 2010 e acquisita poi dalla Semtech nel 2012. È  la prima tecnologia che sfrutta la modulazione \gls{css} per inviare dati, prima di allora veniva usata solamente per radar e sonar \parencite{SemtechHistoryLoRa}.
+LoRa è implementata in oltre di 410 milioni di \gls{enddev} e supporta più del 30\% delle connessioni \gls{lpwan} nel mondo \parencite{SemtechLoRaOverview}.
+
+\section{Caratteristiche generali}
+
+LoRa è quindi una tecnologia di modulazione a spettro espanso di proprietà della Semtech che fornisce comunicazioni a lungo-raggio (fino a 5km in aree urbane e fino a 15km in aree rurali), creata con l'obiettivo di standardizzare le reti \gls{lpwan} \parencite{ITU-T, Milarokostas2023}. Una caratteristica importante di LoRa è la bassissima richiesta di energia che permette alla batteria di alcuni dispositivi di durare fino a 10 anni. 
+
+Deriva dalla modulazione \gls{css} che "sacrifica" il \gls{datarate} per la \gls{sensitività}. Grazie allo \gls{spreadingfactor} ortogonale il \gls{datarate} è variabile e il progettista può scambiare \gls{datarate} con portata o potenza mantenendo costante la larghezza di banda
+
+LoRa è un'implementazione del \gls{phy} interoperabile con implementazioni nei livelli più alti, ciò permette a LoRa di coesistere e operare con architetture di rete già esistenti.
+
+\section{\gls{css}}
+
+LoRa è, come già detto precedentemente, derivante dalla modulazione \gls{css} \parencite{ITU-T, Milarokostas2023}. Le modulazioni a spettro espanso diffondono il segnale su una banda più larga del normale, ottenendo così performance migliori in resistenza alle interferenze e di difficoltà di intercettazione.
+
+Tra le principali tecnologie di modulazione a spettro espanso troviamo \gls{dsss}  e \gls{fhss}, esistono poi altri metodi ma sono meno utilizzati. Le modulazioni \gls{css} sono considerate un alternativa a quelle \gls{dsss}, dove la fase portante del trasmettitore cambia in base a una sequenza  di codifica; questo processo avviene moltiplicando i dati desiderati con un codice di spreading chiamato sequenza di chip. Questa sequenza ha una frequenza molto più alta rispetto al segnale dei dati e perciò espande la larghezza di banda di quest'ultimo. 
+Quando il segnale giunge al mittente viene recuperato ri-moltiplicando con una replica della sequenza di spreading generata localmente. Questo comporta che il segnale torni alla sua larghezza di banda originale.
+
+La modulazione \gls{dsss} è usata principalmente nelle applicazioni di comunicazione. Ci sono però delle difficoltà per dispositivi e reti low-cost o con limiti di energia, per esempio nel caso dei GPS il sistema richiederebbe una sorgente di clock molto accurata e costosa. In più maggiore è la sequenza di spreading maggiore è il tempo richiesto dal ricevente per ritrasformare il segnale 
+
+Diventa una buona opzione perciò la modulazione \gls{css}, che grazie alla bassa richiesta di energia e alla resistenza alla degradazione del canale diventa una scelta ottimale.
+Nella modulazione \gls{css} l'espansione dello spettro si ottiene generando un segnale chirp che varia continuamente in frequenza, la larghezza di banda del segnale è quindi equivalente a quella del chirp. I dati voluti sono quindi chippati a un \gls{datarate} maggiore e modulati in un segnale chirp.
+
+Le proprietà chiave della modulazione LoRa sono:
+\begin{itemize}
+    \item Larghezza di banda scalabile: la larghezza di banda e la frequenza sono entrambe scalabili. La modulazione LoRa può essere usata quindi sia per applicazioni a banda stretta con salti di frequenza sia per applicazioni a banda larga con sequenza diretta. Per adattare LoRa a un certo utilizzo bastano pochi cambiamenti di configurazione
+    \item Inviluppo costante e basso consumo: LoRa, similmente al \gls{fsk}, è una tecnologia di modulazione a inviluppo costante (l'ampiezza non cambia); questo permette il re-utilizzo senza modifiche degli stessi amplificatori di potenza. Inoltre, grazie al guadagno di elaborazione di LoRa,  al l'energia in uscita del trasmettitore può essere ridotta rispetto a un collegamento \gls{fsk} convenzionale,  mantenendo lo stesso o anche un miglior link budget
+    \item Alta robustezza:  un segnale LoRa è molto resistente a meccanismi di interferenza dentro e fuori banda
+    \item Resistenza a \gls{multipath} e \gls{fading}: la pulsazione chirp ha una banda relativamente larga, grazie a ciò LoRa è resistente a \gls{multipath} e \gls{fading}. Questa caratteristica è ottimale per l'utilizzo in ambienti urbani e suburbani
+    \item Resistenza all'\gls{dopplereffect}:  una variazione doppler causa una piccola variazione di frequenza nella pulsazione LoRa e, dato che il segnale chirp ha una certa soglia di tolleranza, questo crea a sua volta una variazione nell'asse del tempo del segnale in banda base che è però trascurabile
+    \item Capacità a lungo raggio: in un contesto dove l'energia in uscita e il rendimento sono fissi, il \gls{linkbudget} è migliore di quello di un \gls{fsk} convenzionale. Questo si riflette anche nella distanza massima, che può essere fino a 4 volte maggiore
+    \item Ottima capacità di rete: la modulazione LoRa sfrutta \gls{spreadingfactor} ortogonali, il che permette a più segnali espansi di essere trasmessi contemporaneamente e sullo stesso canale senza intaccare la ricezione
+\end{itemize}
+
+
+\chapter{Reti LoRa/LoRaWAN, architettura e componenti}
+
+Nel tempo, dopo l'acquisizione della compagnia Cycleo da parte della Semtech, venne sviluppato anche un protocollo \gls{mac} chiamato LoRaMAC. Nel 2015 venne fondata la LoRa Alliance®, e LoRaMAC divenne LoRaWAN, con l'obiettivo di "supportare e promuovere l'adozione globale dello standard LoRaWAN garantendo l'interoperabilità di tutte le tecnologie e i prodotti LoRaWAN" \parencite{SemtechHistoryLoRa}.
+
+
+\section{Introduzione}
+
+Mentre LoRa risiede nel \gls{phy}, LoRaWAN è il protocollo che risiede nel livello \gls{mac}. Solo insieme formano l'implementazione di una \gls{lpwan}. LoRaWAN definisce quindi i protocolli di comunicazione utilizzati dai vari componenti con chip LoRa \parencite{LoRaSpec1.0.4, Milarokostas2023}. 
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{photo/Architettura/struttura_protocollo.png}
+    \caption{Modello OSI per LoRa}
+    \label{fig:esempio1}
+\end{figure}
+
+\section{Topologia Star-of-Stars}
+
+Uno Star network è un tipo di topologia di rete dove tutti i dispositivi (host) sono connessi ad un hub o a uno switch centrale da cui passano tutti i dati. Una topologia Star-of-Stars consiste invece in più Star network sono connessi a uno Star Network centrale \parencite{LoRaSpec1.0.4, Milarokostas2023}.
+Questa comporta vantaggi e implicazioni:
+\begin{itemize}
+    \item Semplice tracciamento di asset: dato che un nodo manda dati a più \gls{gw}s non è necessaria una comunicazione diretta tra due \gls{gw}s. Questo semplifica la logica per le applicazioni di tracciamento di asset dove i nodi sono mobili
+    \item Ideale per reti pubbliche: avere un server centrale che mitiga i problemi di collisione, che solitamente è costoso e complesso, implica che LoRa/LoRaWAN non sia ottimale per reti private, dove solitamente si opta per soluzioni come WiFi e Zigbee
+\end{itemize}
+
+\section{Componenti della rete}
+
+Una rete LoRa/LoRaWAN è composta da \parencite{LoRaSpec1.0.4, Milarokostas2023}:
+\begin{itemize}
+    \item \gls{enddev}: sensori o attuatori che sia mandano messaggi wireless a dei \gls{gw}s con modulazione LoRa sia ricevono messaggi dai \gls{gw}s stessi. Un \gls{enddev} può trasmettere in ogni canale disponibile in ogni momento fintanto che:
+    \begin{itemize}
+        \item Cambia canale in maniera pseudo-casuale a ogni trasmissione
+        \item Rispetta il massimo \gls{dutycyc} di trasmissione relativo alla sottobanda usata e a regolamenti locali
+        \item Rispetta la massima durata di trasmissione relativa a sottobanda usata e a regolamenti locali
+    \end{itemize}
+    \item \gls{gw}s: ricevono messaggi dagli \gls{enddev} e li inoltrano al \gls{netser} o viceversa, sono a loro volta divisi in:
+    \begin{itemize}
+        \item Indoor (picocell): sono più convenienti e adatti a posti chiusi, hanno un'antenna interna o esterna
+        \item Outdoor (macrocell): hanno solitamente un raggio molto più ampio di quelli indoor, usualmente c'è un'antenna esterna collegata con cavo coassiale
+    \end{itemize}
+    \item \gls{appser}: software sul server che si occupa della sicurezza dell'elaborazione dei dati, genera anche \gls{dlk} payloads 
+    \item \gls{joinser}: software sul server che tratta le richieste di join degli \gls{enddev}
+    \item \gls{netser}: amministra tutti gli altri componenti nella rete svolgendo diversi compiti
+    
+\end{itemize}
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{photo/Architettura/LoRaWAN-Star-of-Stars-topology.jpg}
+    \caption{Topologia Star-of-Stars}
+    \label{fig:esempio2}
+\end{figure}
+
+\section{LoRaWAN relay}
+
+In LoRaWAN il relay è un \gls{enddev} standard che entra in funzione quando \gls{enddev} e \gls{gw} non riescono a comunicare direttamente per colpa di ostacoli o della distanza \parencite{TTNRelay}.
+Ogni relay può servire fino a 16 \gls{enddev}, e conosce a priori il canale di comunicazione con cui comunicare con questi \parencite{TTNRelay}.
+Il funzionamento avviene in questo modo:
+\begin{enumerate}
+    \item Un \gls{enddev} invia un frame \gls{wor}, che "risveglia" il relay e condivide parametri radio (come frequenza e \gls{datarate}) che verranno usati nel successivo frame \gls{ulk}
+    \item Se non è presente attività radio il relay entra in una sleep mode dove rimane attivo a bassissimo consumo. In questa modalità esegue periodicamente una \gls{cad}, che ha una durata variabile da 25ms a 1s,  per verificare la presenza di attività radio 
+    \item Se il relay rileva qualcosa passa alla Reception Mode. In questa modalità de-modula il frame \gls{wor}, se l'operazione va a buon fine invia una WOR-ACK all'\gls{enddev} con informazioni annesse utili a quest'ultimo per allinearsi con il relay
+    \item Infine il relay rimane in attesa del prossimo LoRaWAN frame dall'\gls{enddev}. Dopo averlo ricevuto gli aggiunge un campo di 6 bytes, il frame risultante prende il nome di Relay \gls{ulk} FRMPayload. A questo punto il relay crea un nuovo LoRaWAN frame inserendo il Relay \gls{ulk} FRMPayload nel suo Payload e lo invia al \gls{netser} \parencite{TTNRelay}
+\end{enumerate}
+
+\section{Classi di dispositivi}
+
+I dispositivi LoRa/LoRaWAN possono essere di 3 classi: A, B o C. Tutti i dispositivi devono implementare almeno le funzionalità di classe A, e eventualmente quelle di classe B o C.
+
+\chapter{Classe A}
+
+Gli \gls{enddev} di classe A devono permettere comunicazioni bi-direzionali dove ogni trasmissione \gls{ulk} e seguita da 2 brevi \gls{rx} per ricevere \gls{dlk}. Programmano la trasmissione \gls{ulk} in base alle loro necessità, con una piccola variazione casuale di tempo. Questa classe definisce il modello operativo di minor consumo energetico ed è ottimale per applicazioni che richiedono comunicazioni \gls{dlk} solamente dopo una comunicazione \gls{ulk} \parencite{LoRaSpec1.0.4, LoRaSpec1.1, Milarokostas2023}.
+
+\section{Messaggi del \gls{phy}}
+
+\subsection{Formato dei messaggi fisici}
+
+Il formato cambia in base alla direzione del messaggio:
+\begin{itemize}
+    \item I messaggi \gls{ulk} vengono trasmessi da 1 o più \gls{enddev}. Usano la LoRa Radio Packet Explicit Mode, nella quale sono inclusi sia il LoRa physical header (PHDR) sia un header CRC (PHDR\_CRC). Il pacchetto avrà quindi questa struttura:
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=0.6\textwidth]{photo/phy/LoRaWAN_phy_up_frame.png}
+        \caption{Struttura frame \gls{ulk}}
+        \label{fig:esempio3}
+    \end{figure}
+    \item I messaggi \gls{dlk} sono invece trasmessi da un solo \gls{gw}s e usano anche loro la LoRa Radio Packet Explicit Mode, non hanno però il CRC finale.
+    \begin{figure}[ht]
+        \centering
+        \includegraphics[width=0.6\textwidth]{photo/phy/LoRaWAN_phy_down_frame.png}
+        \caption{Struttura frame \gls{dlk}}
+        \label{fig:esempio4}
+    \end{figure}
+\end{itemize}
+
+\subsection{Receive Windows}
+
+Alla fine di ogni trasmissione \gls{ulk} l'\gls{enddev} deve aprire 2 brevi \gls{rx}. La prima, che chiameremo \gls{rx}1, utilizza una frequenza e un \gls{datarate} decisi in funzione di quelli usati nell'\gls{ulk}, di default il \gls{datarate} è uguale a quello \gls{ulk} ma può essere diverso per via di specifiche regionali. Questa finestra apre dopo la fine della modulazione \gls{ulk} con un ritardo chiamato RECEIVE\_DELAY1 (che approfondiremo successivamente). La seconda invece, che chiameremo \gls{rx}2, ha frequenza e \gls{datarate} fissi e configurabili tramite comandi \gls{mac}; di default seguono le specifiche regionali. Anche questa finestra apre dopo la fine della modulazione \gls{ulk} con un ritardo chiamato RECEIVE\_DELAY2.
+
+Le durate di queste \gls{rx} devono essere almeno del tempo richiesto dal trasmettitore radio dell'\gls{enddev} per rilevare efficacemente un preamble \gls{dlk}.
+Se quindi ne viene rilevato uno durante una delle due \gls{rx}, il ricevitore radio rimane attivo finché il frame \gls{dlk} non è stato demodulato. Se questo procedimento viene ultimato entro \gls{rx}1 e viene confermato, dopo il check degli address e del \gls{mic} per confermare che il messaggio era destinato a questo \gls{enddev}, non bisogna aprire \gls{rx}2. 
+
+Se il \gls{netser} vuole trasmettere a un \gls{enddev}, deve iniziare la trasmissione esattamente all'inizio di almeno una delle due \gls{rx}. Un \gls{enddev} deve inoltre aspettare o di aver ricevuto un frame \gls{dlk} durante una delle due finestre o che \gls{rx}2 sia scaduta prima di poter trasmettere un ulteriore frame \gls{ulk} \parencite{LoRaSpec1.0.4, LoRaSpec1.1}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{photo/phy/receive_windows.png}
+    \caption{Tempistiche delle Receive Windows}
+    \label{fig:esempio5}
+\end{figure}
+
+
+
+\section{Messaggi del \gls{mac} layer}
+
+\subsection{Formato dei messaggi del \gls{mac} layer}
+
+Tutti i messaggi LoRa hanno un Payload fisico (PHYPayload) che è diviso in:
+\begin{itemize}
+    \item 1 byte di \gls{mac} Header (MHDR)
+    \item un MACPayload di 7...M bytes (M varia in base alle specifiche regionali) o un messaggio di join: (\gls{jreq}, \gls{rjreq} o \gls{jacc}). Il MACPayload si divide a sua volta in:
+    \begin{itemize}
+        \item FHDR (che si divide ulteriormente)
+        \item FPort
+        \item FRMPayload
+    \end{itemize}
+    \item 4 byte di \gls{mic} \parencite{LoRaSpec1.0.4, LoRaSpec1.1}
+\end{itemize}
+
+L'Header si divide in
+\begin{itemize}
+    \item 7..5 bits di MType
+    \item 4..2 bits di \gls{rfu}
+    \item e 1..0 bits di Major
+\end{itemize}
+
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{photo/mac/MAC_frame_structure.png}
+    \caption{Struttura del frame}
+    \label{fig:esempio6}
+\end{figure}
+
+
+\subsection{\gls{mac} Header}
+
+\subsubsection{MType}
+
+Il campo MType specifica la tipologia di messaggio MAC, in LoRa/LoRaWAN sono 8 \parencite{LoRaSpec1.0.4, LoRaSpec1.1}:
+\begin{enumerate}
+    \item[\textbf{000}] Join-request
+    \item[\textbf{001}] Join-Accept
+    \item[\textbf{010}] Unconfirmed Data Up
+    \item[\textbf{011}] Unconfirmed Data Down
+    \item[\textbf{100}] Confirmed Data Up
+    \item[\textbf{101}] Confirmed Data Down
+    \item[\textbf{110}] Rejoin-request
+    \item[\textbf{111}] Proprietary
+\end{enumerate}
+
+I messaggi di \gls{jreq}, \gls{rjreq} e \gls{jacc} sono usati per l'attivazione \gls{ota}
+
+I messaggi data sono usati sia per comandi \gls{mac} sia per application data, è possibile anche combinare entrambi nello stesso messaggio. 
+La differenza tra confirmed e unconfirmed sta nel fatto che il primo deve essere riconosciuto dal ricevente mentre il secondo no.
+
+I messaggi proprietari possono essere usati per implementare formati non standard di messaggi e vanno usati solamente da dispositivi che hanno una comune comprensione dell'estensione proprietaria. Se viene ricevuto un messaggio proprietario sconosciuto va scartato.
+
+
+\subsubsection{\gls{rfu}}
+
+Il campo \gls{rfu} è, come facilmente intuibile, riservato per usi futuri
+
+\subsubsection{Major}
+
+Il campo Major specifica il formato dei messaggi scambiati nella procedura di join e i primi 4 bytes del \gls{mac} Payload. Per ogni versione Major gli \gls{enddev} possono implementare diverse versioni minori del formato del frame. La versione minore usata dal \gls{enddev} deve prima essere fatta conoscere al \gls{netser} tramite configurazione manuale o tramite un sistema Device Management. Se si riceve una versione sconosciuta il frame va scartato.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.6\textwidth]{photo/mac/major.png}
+    \caption{Struttura del campo Major}
+    \label{fig:esempio7}
+\end{figure}
+
+\subsection{\gls{mac} Payload}
+
+\subsubsection{Frame Header(FHDR)}
+
+Il campo FHDR contiene:
+\begin{itemize}
+    \item l'indirizzo breve dell'\gls{enddev} (DevAddr)
+    \item 1 byte di frame control (FCtrl)
+    \item 2 byte di frame counter (FCnt)
+    \item fino a 15 byte di frame option (FOpts), se presenti vanno criptati
+\end{itemize}
+
+\paragraph{Frame control} 
+
+A ogni bit corrisponde un contenuto diverso, i bit possono essere:
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/mac/bits_fctrl.png}
+    \caption{Bits di FCtrl}
+    \label{fig:esempio8}
+\end{figure}
+
+Nei frame \gls{dlk} corrispondono rispettivamente a:
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/mac/fctrl_down.png}
+    \caption{Struttura campo FCtrl \gls{dlk}} 
+    \label{fig:esempio9}
+\end{figure}
+Invece nei frame \gls{ulk} corrispondono rispettivamente a:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/mac/fctrl_up.png}
+    \caption{Struttura campo FCtrl \gls{ulk}}
+    \label{fig:esempio10}
+\end{figure}
+
+\subparagraph{\gls{adr}}
+
+Le reti LoRa permettono agli \gls{enddev} di utilizzare ogni possibile \gls{datarate} e \gls{tx}, lo scopo è di adattare questi due parametri agli \gls{enddev} statici. Questa caratteristica si chiama \gls{adr}, e quando è attivo la rete cercherà di utilizzare il maggior \gls{datarate} possibile. L'\gls{adr} potrebbe non essere possibile quando il canale radio cambia velocemente e in maniera rapida nel tempo; se questo succede il controllo del \gls{datarate} passa dal \gls{netser} al livello applicazione dell'\gls{enddev}, e quest'ultimo dovrà cercare di variare lo \gls{spreadingfactor} minimizzando il tempo totale di air occupation.
+
+Se il bit di \gls{adr} è settato nell'\gls{ulk} il \gls{netser} controllerà \gls{datarate} e \gls{tx} dell'\gls{enddev} tramite comandi \gls{mac}. Nel \gls{dlk} informa l'\gls{enddev} che il \gls{netser} è in posizione di inviare comandi \gls{adr}
+
+Se invece non è settato nell'\gls{ulk} il \gls{netser} non proverà a controllare il \gls{datarate} o la \gls{tx} dell'\gls{enddev}. Nel \gls{dlk} informa l'\gls{enddev} che, per colpa di rapide variazioni del segnale radio, la rete non può temporaneamente stimare il miglior \gls{datarate}. Perciò l'\gls{enddev} può:
+\begin{itemize}
+    \item Unsettare il bit \gls{adr} nell'\gls{ulk}, seguendo così le proprie decisioni
+    \item Ignorare il fatto, tenendo il bit settato, e applicare il normale decadimento del \gls{datarate} in assenza di comandi \gls{adr} \gls{dlk}
+\end{itemize}
+
+Il \gls{adr} può essere settato/unsettato a comando dall'\gls{enddev} o dal \gls{netser}; tuttavia, quando possibile, l'ADR dovrebbe essere attivato per aumentare la vita della batteria dell'\gls{enddev} e massimizzare la capacità della rete.
+
+Di default la \gls{tx} è la massima permessa da capacità del dispositivo e limitazioni regionali. Il dispositivo deve utilizzare questa potenza fintanto che il \gls{netser} chiede di diminuire tramite il comando LinkADReq.
+Se il \gls{netser} fa usare un \gls{datarate} maggiore di quello di default o una \gls{tx} minore di quello di default, l'\gls{enddev} deve confermare periodicamente che il \gls{netser} riceva ancora frame \gls{ulk}. Quindi ogni volta che l'\gls{ulk} frame counter incrementa, l'\gls{enddev} incrementa l'ADR\_ACK\_CNT counter. Dopo un certo limite (ADR\_ACK\_LIMIT) senza alcuna risposta \gls{dlk}, l'\gls{enddev} setta ADRACKReq (bit di richiesta ACK) e il \gls{netser} dovrà rispondere con un frame \gls{dlk} entro i prossimi ADR\_ACK\_DELAY frames (se viene ricevuto l'ACK il counter si resetta). 
+Il bit di ACK \gls{dlk} non va settato se c'è una qualsiasi risposta durante gli slot di ricezione dell'\gls{enddev} che indichi che il \gls{gw} ha ricevuto messaggi \gls{ulk} da questo dispositivo. 
+Se non avviene alcuna risposta l'\gls{enddev} proverà a riconnettersi risettando la \gls{tx} al default e diminuendo di poco il \gls{datarate} per fornire un range maggiore. Ogni volta che non si riceve risposta (dopo l'ADR\_ACK\_DELAY) bisogna diminuire ulteriormente il \gls{datarate} \parencite{LoRaSpec1.0.4, Milarokostas2023}.
+
+\subparagraph{FPending}
+
+Fpending è usato solamente nelle comunicazioni \gls{dlk}, indica che la rete ha più dati in attesa di essere inviati e quindi chiede all'\gls{enddev} di aprire un'altra \gls{rx} il prima possibile mandando un altro messaggio \gls{ulk}.
+
+\subparagraph{FOptsLen}
+
+FOptsLen denota la lunghezza di FOpts, questo trasporta comandi \gls{mac} di una lunghezza max di 15 byte. Se FOptsLen è 0 non c'è FOpts, altrimenti sono presenti MAC commands e FPort non può avere la porta 0. I comandi \gls{mac} non possono essere simultaneamente presenti sia in FOpts che nel Payload, se avviene il frame va ignorato
+
+
+\subparagraph {ACK}
+Quando viene ricevuto un confirmed data message, il ricevente deve rispondere con un data frame con il bit di ACK settato. Se il mandante è un \gls{enddev} il \gls{netser} proverà a mandare un ACK usando una delle \gls{rx} aperte dal dispositivo dopo l'operazione di invio. Se il mandante è un \gls{gw}, l'\gls{enddev} trasmette un ACK a sua discrezione.
+
+Le regole per la ritrasmissione sono:
+\begin{itemize}
+    \item I \gls{dlk} confirmed o unconfirmed frame non devono essere ritrasmessi usando lo stesso valore del frame counter. Se arriva un confirmed \gls{dlk}, nel caso un ACK non venga ricevuto, l'\gls{appser} viene notificato e può decidere di ritrasmettere un nuovo confirmed
+    \item Gli \gls{ulk} confirmed o unconfirmed frames vengono ritrasmessi NbTrans volte, tranne se un \gls{dlk} valido viene ricevuto dopo una trasmissione. NbTrans può essere usato dal manager della rete per controllare la ridondanza del nodo \gls{ulk} per ottenere una certa QoS.
+    \item L'\gls{enddev} deve fare \gls{freqhop} tra le trasmissioni ripetute e deve aspettare dopo ogni ritrasmissione la scadenza di \gls{rx}1 e \gls{rx}2.
+    \item I dispositivi di classe A devono fermare ogni ulteriore ritrasmissione quando ricevono un valido \gls{dlk} durante una delle due \gls{rx}
+\end{itemize}
+
+\paragraph{Frame counters}
+
+Ogni \gls{enddev} ha più frame counters per tenere traccia del numero di data frames mandati \gls{ulk} (FCntUp) e \gls{dlk} (FCntDown).
+Nel \gls{dlk} ci sono due diversi comportamenti possibili \parencite{LoRaSpec1.0.4, LoRaSpec1.1}:
+\begin{itemize}
+    \item quando il dispositivo opera in LoRaWAN 1.0 device, tutte le porte condividono lo stesso FCntDown \parencite{LoRaSpec1.0.4}
+    \item Quando il dispositivo opera in LoRaWAN 1.1 ci sono 2 counter:  un NFCntDown è usato per le comunicazioni \gls{mac} sulla porta 0 o se FPort è assente e un AFCntDown per tutte le altre porte \parencite{LoRaSpec1.1}. NFCntDown è gestito dall'\gls{netser}. AFCntDown dall'\gls{appser}.
+\end{itemize}
+
+Quindi:
+\begin{itemize}
+    \item FCntUp incrementa con ogni \gls{ulk}
+    \item NFCntDown con ogni \gls{dlk} su FPort 0 o quando FPort non è presente.
+    \item AFCntDown incrementa con ogni \gls{dlk} in porte differenti da 0
+\end{itemize}
+
+Nel dispositivo ricevente il counter corrispondente è sincronizzato con il valore ricevuto. Questo viene fatto tramite confronto con il valore ricevuto e con il MIC del messaggio. FCnt non aumenta nel caso di trasmissioni multiple di un confirmed o unconfirmed frame. Il \gls{netser} deve scartare l'application Payload dei frame ritrasmessi e inviarne una singola istanza all'\gls{appser}.
+
+Quando un dispositivo \gls{ota} elabora con successo un messaggio di Join-accept, i frame counters dell'\gls{enddev} e del \gls{netser} per quel dispositivo sono azzerati.
+I dispositivi \gls{abp} invece hanno i frame counters inizializzati a 0 alla costruzione. Dopodiché non devono mai essere resettati durante la vita del dispositivo. 
+
+
+\subsubsection{FPort}
+
+FPort ha la funzione di identificare il tipo contenuto del Payload. È opzionale ma se il Payload è presente deve esserci. Se ha valore 0 indica che FRMPayload contiene solo comandi \gls{mac}, e ogni frame con questa porta deve essere processato da implementazioni LoRaWAN. Se ha un valore compreso tra 1 e 223 il frame è specifico per l'application e va reso disponibile all'\gls{appser}. Il valore 224 viene utilizzato invece per il protocollo di test del LoRaWAN \gls{mac} layer. Valori compresi tra il 225 e il 255 sono riservati per usi futuri.
+
+
+\section{Comandi \gls{mac}}
+
+I comandi \gls{mac} sono messaggi di controllo che possono essere scambiati esclusivamente tra \gls{netser} e il livello \gls{mac} dell'\gls{enddev} per gestire e configurare la comunicazione della rete. Non sono mai visibili dall'\gls{appser} o all'applicazione dell'\gls{enddev}.
+
+Un comando \gls{mac} consiste in un \gls{cid} di 1 byte seguito da una sequenza di byte rappresentanti il comando vero e proprio. Un singolo data frame può contenere una sequenza qualsiasi di comandi \gls{mac} e questi possono essere trasportati o nel campo FOpts o nel FRMPayload (con FPort settato a 0).
+
+Una volta arrivati al ricevente devono essere risposti/riconosciuti nello stesso ordine in cui sono stati trasmessi. Le risposte vengono accumulate sequenzialmente ad un buffer.
+
+Tutti i comandi ricevuti in un frame devono essere risposti in un singolo frame; se il buffer con la risposta è più grande della lunghezza massima di FOpts il dispositivo deve mandarlo come FRMPayload sulla porta 0. Se sono da inviare sia un application Payload sia una risposta \gls{mac}, quest'ultima ha la priorità.
+Se la lunghezza del buffer è più grande della massima dimensione del FRMPayload, il dispositivo prima di assemblare il frame deve troncarlo per farlo rientrare nei limiti. Il \gls{netser} però non dovrebbe generare una sequenza di comandi a cui il device non possa rispondere in un singolo \gls{ulk}.
+Possiamo osservare i principali comandi \gls{mac}:
+
+\begin{longtable}{l l c p{7.5cm}}
+\caption{Elenco completo dei comandi MAC LoRaWAN.} \label{tab:mac_commands} \\
+
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}{{\bfseries \tablename\ \thetable{} -- continua dalla pagina precedente}} \\
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{4}{r}{{Continua nella pagina successiva...}} \\
+\bottomrule
+\endfoot
+
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textit{}}
+\endlastfoot
+
+0x01 & \texttt{ResetInd} & \gls{enddev} & Indica un reset di un dispositivo \gls{abp} e negozia la versione del protocollo. \\
+0x01 & \texttt{ResetConf} & \gls{gw} & Conferma (ACK) il comando \texttt{ResetInd}. \\
+\addlinespace
+0x02 & \texttt{LinkCheckReq} & \gls{enddev} & Usato da un \gls{enddev} per validare la connettività con la rete. \\
+0x02 & \texttt{LinkCheckAns} & \gls{gw} & Risposta a \texttt{LinkCheckReq}. Contiene il margine di demodulazione (Link Margin). \\
+\addlinespace
+0x03 & \texttt{LinkADRReq} & \gls{gw} & Richiede all'\gls{enddev} di cambiare \gls{datarate}, potenza, ripetizioni o canali. \\
+0x03 & \texttt{LinkADRAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{LinkADRReq}. \\
+\addlinespace
+0x04 & \texttt{DutyCycleReq} & \gls{gw} & Imposta il \gls{dutycyc} massimo aggregato per il dispositivo. \\
+0x04 & \texttt{DutyCycleAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{DutyCycleReq}. \\
+\addlinespace
+0x05 & \texttt{RXParamSetupReq} & \gls{gw} & Imposta i parametri (frequenza/DR) degli slot di ricezione. \\
+0x05 & \texttt{RXParamSetupAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{RXParamSetupReq}. \\
+\addlinespace
+0x06 & \texttt{DevStatusReq} & \gls{gw} & Richiede lo stato corrente del dispositivo. \\
+0x06 & \texttt{DevStatusAns} & \gls{enddev} & Restituisce il livello della batteria e il margine di demodulazione. \\
+\addlinespace
+0x07 & \texttt{NewChannelReq} & \gls{gw} & Crea o modifica la definizione di un canale radio. \\
+0x07 & \texttt{NewChannelAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{NewChannelReq}. \\
+\addlinespace
+0x08 & \texttt{RXTimingSetupReq} & \gls{gw} & Imposta la tempistica (delay) degli slot di ricezione. \\
+0x08 & \texttt{RXTimingSetupAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{RXTimingSetupReq}. \\
+\addlinespace
+0x09 & \texttt{TxParamSetupReq} & \gls{gw} & Imposta il \textit{dwell time} e il Max EIRP in base alle normative locali. \\
+0x09 & \texttt{TxParamSetupAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{TxParamSetupReq}. \\
+\addlinespace
+0x0A & \texttt{DlChannelReq} & \gls{gw} & Modifica la frequenza di \gls{dlk} creando un canale asimmetrico. \\
+0x0A & \texttt{DlChannelAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{DlChannelReq}. \\
+\addlinespace
+0x0B & \texttt{RekeyInd} & \gls{enddev} & Segnala un aggiornamento del contesto di sicurezza (dispositivi OTAA). \\
+0x0B & \texttt{RekeyConf} & \gls{gw} & Conferma (ACK) il comando \texttt{RekeyInd}. \\
+\addlinespace
+0x0C & \texttt{ADRParamSetupReq} & \gls{gw} & Imposta i parametri \texttt{ADR\_ACK\_LIMIT} e \texttt{ADR\_ACK\_DELAY}. \\
+0x0C & \texttt{ADRParamSetupAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{ADRParamSetupReq}. \\
+\addlinespace
+0x0D & \texttt{DeviceTimeReq} & \gls{enddev} & Richiede alla rete la data e l'ora correnti. \\
+0x0D & \texttt{DeviceTimeAns} & \gls{gw} & Risposta della rete con il timestamp GPS. \\
+\addlinespace
+0x0E & \texttt{ForceRejoinReq} & \gls{gw} & Ordina al dispositivo di effettuare immediatamente un Rejoin. \\
+\addlinespace
+0x0F & \texttt{RejoinParamSetupReq} & \gls{gw} & Imposta la periodicità dei messaggi di Rejoin automatici. \\
+0x0F & \texttt{RejoinParamSetupAns} & \gls{enddev} & Conferma (ACK) il comando \texttt{RejoinParamSetupReq}. \\
+\addlinespace
+0x80..FF & \textit{Proprietario} & -- & Riservato per estensioni proprietarie non standard. \\
+\end{longtable}
+
+
+\section{Attivazione degli \gls{enddev}}
+
+Per partecipare ad una rete LoRa/LoRaWAN ogni \gls{enddev} deve essere personalizzato e attivato o tramite \gls{otaa}  o tramite \gls{abp}.
+
+\subsection{Pre-Attivazione}
+
+\subsubsection{ID}
+
+JoinEUI è un \gls{glid} che identifica univocamente il \gls{joinser}. I dispositivi \gls{ota} devono averlo prima ancora che la procedura di join sia eseguita, mentre per i dispositivi \gls{abp} il JoinEUI non è richiesto.
+
+DevEUI è un \gls{glid} appartenente all'\gls{enddev} e lo identifica univocamente. È  l'id identificativo raccomandato dal \gls{netser} in qualsiasi procedura di attivazione. I dispositivi \gls{ota} devono averlo prima ancora che la procedura di join sia eseguita, mentre per i dispositivi \gls{abp} il JoinEUI è solamente raccomandato.
+
+\subsubsection{Root keys}
+
+\gls{nwk} e \gls{appk} sono due \gls{aes128} specifiche per l'\gls{enddev} assegnate a quest'ultimo durante la sua costruzione. Ogni volta che un \gls{enddev} entra via \gls{otaa} queste root keys si utilizzano per derivare diverse \gls{seskey}. La \gls{nwk} si utilizza per derivare 3 \gls{seskey} di rete: \gls{fnwk}, \gls{snwk} e \gls{nwks}. La \gls{appk} si usa invece per derivare una \gls{seskey} dell'applicazione: \gls{appsk} \parencite{LoRaSpec1.1}.
+Queste chiavi sono richieste solamente se si intende usare la \gls{otaa}, nella \gls{abp} non sono richieste.
+
+Per assicurare la retro-compatibilità con LoRaWAN 1.0 e versioni precedenti che non supportano 2 root keys, l'\gls{enddev} dovrà (solamente in questi casi) utilizzare solamente la \gls{nwk}. Questa condizione viene segnalata settando il bit OptNeg a 0 nel messaggio di \gls{jacc}. Verranno quindi derivate \gls{appsk} e \gls{fnwk} dalla \gls{nwk}, \gls{snwk} e \gls{nwks} saranno uguali alla \gls{fnwk} \parencite{LoRaSpec1.0.4, LoRaSpec1.1}.
+
+Questi schemi sintetizzano la derivazione delle chiavi:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/Activation/key_derivation_0.png}
+    \caption{Derivazioni chiavi LoRaWAN 1.0}
+    \label{fig:esempio11}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/Activation/key_derivation_1.jpg}
+    \caption{Derivazioni chiavi LoRaWAN 1.1}
+    \label{fig:esempio12}
+\end{figure}
+
+
+\subsection{Post-Attivazione}
+
+Nell'\gls{enddev} dopo l'attivazione, oltre le \gls{seskey} generate, viene conservato anche il DevAddr: un indirizzo a 32 bit allocato dal \gls{netser} sull'\gls{enddev} che lo identifica nella rete corrente.
+
+Le keys generate a questo punto vengono utilizzate:
+
+\begin{itemize}
+    \item \gls{fnwk} è specifica per l'\gls{enddev} e si utilizza per calcolare, interamente o in parte, il \gls{mic} di tutti i messaggi data \gls{ulk} e per assicurare l'integrità dei dati
+    \item \gls{snwk} è specifica per l'\gls{enddev} e si utilizza per: verificare il \gls{mic} di tutti i messaggi data \gls{dlk}, assicurare l'integrità dei dati e calcolare metà del \gls{mic} dei messaggi data \gls{ulk}
+    \item \gls{nwks} è specifica per l'\gls{enddev} e si utilizza per criptare e decriptare comandi \gls{mac} \gls{ulk} e \gls{dlk} 
+    \item \gls{appsk} è specifica per l'\gls{enddev} ed è utilizzata sia da quest'ultimo sia dall'\gls{appser} per criptare e decriptare il Payload dei messaggi application-specific
+\end{itemize}
+
+Ci sono due contesti di sessione, quello di rete e quello di applicazione.
+Il primo è mantenuto da \gls{netser} e \gls{enddev} ed è composto dai seguenti parametri: \gls{fnwk}, \gls{nwks}, FCntUp, FCntDwn o NFCntDwn e DevAddr
+Il secondo è mantenuto da \gls{appser} e \gls{enddev} ed è composto invece da: \gls{appsk}, FCntUp e FCntDwn o AFCntDwn
+Chiavi e indirizzi sono fissati per la durata della sessione e i contatori incrementano col traffico.
+
+\subsection{\gls{otaa}}
+
+Gli \gls{enddev} attivati via \gls{ota} devono seguire una procedura di join prima di iniziare a scambiare dati con il \gls{netser}. Qualora un \gls{enddev} dovesse perdere il contesto di sessione, dovrà ripetere la procedura. I requisiti per iniziarla sono che l'\gls{enddev} sia in possesso di: DevEUI, JoinEUI, \gls{nwk} e \gls{appk}.
+
+Dal punto di vista dell'\gls{enddev} la procedura consiste prima in una \gls{jreq} o in una \gls{rjreq}, e infine se è andato tutto a buon fine con una \gls{jacc} (se l'operazione dovesse non andare a buon fine non vengono inviate risposte):
+
+\begin{itemize}
+    \item La \gls{jreq} consiste nell'invio al \gls{netser} di un messaggio contenente JoinEUI, DevEUI e DevNonce. Quest'ultimo è un counter che parte da 0 e incrementa ad ogni richiesta, resettandosi poi quando \gls{enddev} si accende
+    \item La \gls{jacc} è invece la risposta di conferma del \gls{netser}, viene inviata come un normale \gls{dlk} ma utilizza i ritardi JOIN\_ACCEPT\_DELAY1
+    e JOIN\_ACCEPT\_DELAY2 al posto di RECEIVE\_DELAY\_1 e RECEIVE\_DELAY\_2. a sua volta contiene:
+    \begin{itemize}
+        \item JoinNonce: un counter fornito dal \gls{joinser} e utilizzato dall'\gls{enddev} per derivare \gls{fnwk}, \gls{snwk}, \gls{nwks} e \gls{appsk}
+        \item NetID: è un ID di rete di 24 bits
+        \item DevAddr: indirizzo dell'\gls{enddev}
+        \item DLSetting: contiene la configurazione \gls{dlk}
+        \item RxDelay: indica il ritardo tra ricezione e trasmissione
+        \item CFList: lista opzionale di parametri di rete
+    \end{itemize}
+    \item La \gls{rjreq} viene periodicamente trasmessa dall'\gls{enddev} per dare l'opportunità al backend di inizializzare un nuovo contesto di sessione. Il \gls{netser} risponde con una \gls{jacc} e può inoltre usare le finestre \gls{rx} per trasmettere frame \gls{dlk} con eventualmente anche dei comandi \gls{mac} (utile per resettare i parametri di ricezione dell'\gls{enddev} in caso di uno stato di de-sincronizzazione).
+    Ci sono 3 tipi possibili di \gls{rjreq}, qua sintetizzati:
+
+    \begin{longtable}{c p{12cm}}
+    \caption{Le tre tipologie di messaggi Rejoin-Request.} \label{tab:rejoin_request_types} \\
+    
+    \toprule
+    \textbf{Type} & \textbf{Descrizione e Contenuto} \\
+    \midrule
+    \endfirsthead
+    
+    \multicolumn{2}{c}{{\bfseries \tablename\ \thetable{} -- continua dalla pagina precedente}} \\
+    \toprule
+    \textbf{Type} & \textbf{Descrizione e Contenuto} \\
+    \midrule
+    \endhead
+    
+    \midrule
+    \multicolumn{2}{r}{{Continua nella pagina successiva...}} \\
+    \bottomrule
+    \endfoot
+    
+    \bottomrule
+    \endlastfoot
+    
+    0 & Contiene \texttt{NetID} e \texttt{DevEUI}. Si usa per resettare completamente il contesto di un \gls{enddev}. Questa tipologia può essere instradata solamente al \gls{netser} del device, non al \gls{joinser}. \\
+    \addlinespace
+    1 & Contiene \texttt{JoinEUI} e \texttt{DevEUI}. Equivalente ad un \texttt{Join-Request} ma può essere trasmesso sul traffico normale, senza quindi disconnettere il device. Questa tipologia può essere instradata solamente al \gls{joinser} dell'\gls{enddev}. Si utilizza per ripristinare un contesto di sessione perso. \\
+    \addlinespace
+    2 & Contiene \texttt{NetID} e \texttt{DevEUI}. Si utilizza per la generazione di nuove chiavi di sessione o per cambiare il \texttt{DevAddr} di un ED. I parametri radio non cambiano. È possibile instradare questo messaggio solamente al \gls{netser} dell'\gls{enddev} e non al \gls{joinser}. \\
+    \end{longtable}
+\end{itemize}
+
+
+
+
+\subsection{\gls{abp}}
+
+Nella \gls{abp} un \gls{enddev} si lega direttamente ad un \gls{netser} senza la procedura di Join. DevAddr e le chiavi di sessione sono conservate direttamente nell'\gls{enddev}, perciò l'\gls{enddev} ha tutte le informazioni richieste per partecipare ad una specifica rete LoRa/LoRaWAN già da appena acceso.
+Quando un \gls{enddev} accede per la prima volta ad una rete in questa modalità (o dopo una re-inizializzazione), deve trasmettere il comando \gls{mac} ResetInd in tutti i frame \gls{ulk} finché non riceve un ResetConf dal \gls{netser}.
+
+
+
+\section{Ritrasmissione}
+I frame \gls{ulk} che:
+\begin{itemize}
+    \item Richiedono un ACK o una risposta dal \gls{netser} o dall'\gls{appser} e sono ritrasmessi qualora l'ACK o la risposta non dovessero arrivare
+    \item Possono essere attivati da un evento esterno causando una sincronizzazione in un grande numero di dispositivi (>100)
+\end{itemize}
+Rischiano di attivare una problematica situazione di sovraccarico della rete. Perciò per la ritrasmissione di questi frame verrà adottato un intervallo casuale, che dovrà avere una sequenza diversa per ogni dispositivo, tra la fine di \gls{rx}2 e la prossima ritrasmissione \gls{ulk}.
+
+
+\chapter{Classe B}
+
+Gli \gls{enddev} implementano la classe B quando c'è la necessità di aprire \gls{rsl} in certi intervalli di tempo prefissati, con lo scopo di permettere al \gls{netser} di inviare frame \gls{dlk} senza aver prima ricevuto frame \gls{ulk}.
+Il funzionamento si basa su un concetto di sincronizzazione attuata tramite l'invio di beacon da parte del \gls{gw}, che permettono all'\gls{enddev} di sapere esattamente quando mettersi in ascolto del \gls{netser} aprendo una \gls{rsl} chiamata ping slot \parencite{LoRaSpec1.0.4, LoRaSpec1.1, Milarokostas2023}.
+
+\section{Principi della rete sincronizzata}
+
+Affinché una rete supporti \gls{enddev} di classe B, tutti i \gls{gw}s devono simultaneamente inviare in broadcast un beacon che fornisca a tutti gli \gls{enddev} un riferimento temporale. Basandosi su questo gli \gls{enddev} possono aprire periodicamente ping slots, che possono essere usati per iniziare una trasmissione di frame \gls{dlk} che in questo caso sono chiamati ping.
+
+La scelta del \gls{gw} adatto per iniziare questa comunicazione \gls{dlk} si basa sulla qualità del segnale dell'ultimo \gls{ulk} dell'\gls{enddev}, perciò se l'\gls{enddev} si sposta deve inviare un \gls{ulk} al \gls{netser} in modo tale da permettere a quest'ultimo di aggiornare il percorso di instradamento dei frame \gls{dlk}.
+
+Tutti gli \gls{enddev} iniziano essendo dispositivi di classe A, dopodichè il livello di applicazione dell'\gls{enddev} può decidere di richiedere il cambiamento alla classe B attraverso questo processo:
+
+\begin{enumerate}
+    \item Il livello di applicazione dell'\gls{enddev} chiede allo stack LoRaWAN di cambiare alla classe B, questo perciò inizia la ricerca di un beacon e restituisce: la primitiva di servizio BEACON\_LOCKED se il beacon è stato trovato e "chiuso", la primitiva di servizio BEACON\_NOT\_FOUND se invece non è stato trovato
+    \item Una volta nella classe B il livello \gls{mac} setta a 1 il class B bit nel campo FCtrl di ogni frame \gls{ulk} trasmesso e programma autonomamente una \gls{rsl} per ogni beacon e ogni ping slot. Quando avviene con successo la ricezione di un beacon, lo stack LoRaWAN dell'\gls{enddev} invia il contenuto del messaggio al livello applicazione insieme alla misura della forza del segnale radio. Quando il frame \gls{dlk} viene demodulato correttamente durante un ping slot, viene processato normalmente come se fosse un messaggio normale
+    \item Un \gls{enddev} mobile deve periodicamente informare il \gls{netser} della sua posizione per aggiornare l'instradamento. Questo avviene tramite la normale trasmissione di frame \gls{ulk} confirmed o unconfirmed e ci sono 2 strategie:
+    \begin{enumerate}
+        \item Vengono inviati in modo sistematico e periodico
+        \item Ne viene inviato uno singolo ogni volta che si cambia posizione
+    \end{enumerate}
+    \item Un \gls{enddev} può cambiare la periodicità dei suoi ping slots in ogni momento. Per farlo deve temporaneamente stoppare le operazioni di classe B e inviare un PingSlotInfoReq al \gls{netser}, quando riceve un ACK può riprendere le operazioni
+    \item Un \gls{netser} può in qualsiasi momento cambiare la frequenza dei ping slots o il \gls{datarate} dell'\gls{enddev} tramite l'invio del comando \gls{mac} PingSlotChannelReq
+    \item Se nessun beacon viene ricevuto entro un certo periodo, la sincronizzazione con la rete viene perduta. Se ciò accade il livello \gls{mac} deve informare il livello applicazione del ritorno alla classe A
+\end{enumerate}
+    
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/CLASSE B/BEACON.png}
+    \caption{Ping slot e finestre di ricezione beacon}
+    \label{fig:esempio13}
+\end{figure}
+
+Se durante un ping slot viene rilevato un preamble, il trasmettitore radio rimane attivo finché il frame \gls{dlk} non viene demodulato. Il livello \gls{mac} processerà quindi il frame, controllerà se gli indirizzi corrispondono e se il \gls{mic} è valido prima di inoltrarlo al livello applicazione
+
+
+\section{Frame \gls{ulk} nella classe B}
+
+I frame \gls{ulk} sono identici a quelli della classe A tranne che per il bit \gls{rfu} nel campo FCtrl: nella classe A è inutilizzato, nella classe B è settato a 1 e segnala che l'\gls{enddev} è nella classe B
+
+\section{Frame \gls{dlk} (ping) nella classe B}
+
+I frame possono essere Unicast o Multicast. I primi sono inviati ad un singolo destinatario mentre i secondi a molteplici. Mentre il formato fisico è identico a quello della classe A (sia per frame Unicast che Multicast) il formato \gls{mac} dei frame Multicast cambia:
+\begin{itemize}
+    \item Non possono portare comandi \gls{mac}, ne in FOpts ne nel Payload sulla porta 0
+    \item I bit ACK e ADRACKReq devono essere 0 e il campo MType deve avere il valore di un unconfirmed \gls{dlk}
+    \item Il bit FPending deve indicare se ci sono ulteriori Multicast da inviare
+\end{itemize}
+
+\section{Ricezione e tracciamento dei beacon}
+
+Prima di cambiare da classe A a classe B, come già detto, un \gls{enddev} deve prima ricevere un beacon per allineare il suo orologio interno con quello della rete. Una volta nella classe B, l'\gls{enddev} deve poi periodicamente cercare e ricevere un beacon per eliminare ogni possibile nuovo errore del suo orologio interno e quindi riallinearlo. Se però un \gls{enddev} è temporaneamente inabile a ricevere beacons, deve allargare gradualmente i suoi ping slots e le sue beacon \gls{rsl} per eliminare eventuali sfasamenti del suo orologio rispetto a quello della rete. In questa situazione l'\gls{enddev} dovrebbe mantenere le operazioni di classe B per 2 ore dopo la ricezione dell'ultimo beacon; se arriva la ricezione di un nuovo beacon il tempo si estende per altre 2 ore.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/CLASSE B/Beaconless_time.png}
+    \caption{Operazioni durante assenza di beacon}
+    \label{fig:esempio14}
+\end{figure}
+
+\section{Tempistiche degli slot \gls{dlk}}
+
+Per operare correttamente nella classe B, un \gls{enddev} deve aprire delle \gls{rsl} in precisi istanti calcolati in base alle informazioni ottenute dai beacon. L'intervallo tra l'inizio di 2 beacon successivi si chiama beacon period e la trasmissione di un beacon stesso è allineata con l'inizio dell'intervallo BEACON\_RESERVED.
+Ogni beacon inoltre è preceduto da un intervallo di guard time dove non possono essere inviati ping slots, la lunghezza di questo corrisponde al tempo necessario per la trasmissione via radio del frame più lungo possibile. Questo serve per assicurarsi che la trasmissione di un \gls{dlk} durante un ping slot appena prima della fine del guard time non rischi di collidere con la trasmissione di un beacon.
+L'intervallo utilizzabile per un ping slots quindi parte dalla fine di BEACON\_RESERVED e finisce con l'inizio del prossimo guard time \parencite{LoRaSpec1.0.4, LoRaSpec1.1}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/CLASSE B/beacon_interval.png}
+    \caption{Guard time}
+    \label{fig:esempio15}
+\end{figure}
+
+\section{Comandi \gls{mac} di classe B}
+
+Sono implementati tutti i comandi di classe A e in più:
+
+\begin{longtable}{l l c p{7.5cm}}
+\caption{Comandi MAC specifici per i dispositivi di Classe B.} \label{tab:mac_commands_class_b} \\
+
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}{{\bfseries \tablename\ \thetable{} -- continua dalla pagina precedente}} \\
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{4}{r}{{Continua nella pagina successiva...}} \\
+\bottomrule
+\endfoot
+
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textit{}}
+\endlastfoot
+
+% --- CONTENUTO DELLA TABELLA ---
+0x10 & \texttt{PingSlotInfoReq} & \gls{enddev} & Usato dall'\gls{enddev} per comunicare al \gls{netser} la periodicità dello slot di ping unicast. \\
+0x10 & \texttt{PingSlotInfoAns} & \gls{gw} & Usato dalla rete per confermare (ACK) il comando \texttt{PingSlotInfoReq}. \\
+\addlinespace
+0x11 & \texttt{PingSlotChannelReq} & \gls{gw} & Usato dal \gls{netser} per impostare il canale di ping unicast di un \gls{enddev}. \\
+0x11 & \texttt{PingSlotChannelAns} & \gls{enddev} & Usato dall'\gls{enddev} per confermare (ACK) il comando \texttt{PingSlotChannelReq}. \\
+\addlinespace
+0x12 & \texttt{BeaconTimingReq} & \gls{enddev} & \textit{Deprecato}. \\
+0x12 & \texttt{BeaconTimingAns} & \gls{gw} & \textit{Deprecato}. \\
+\addlinespace
+0x13 & \texttt{BeaconFreqReq} & \gls{gw} & Comando usato dal \gls{netser} per modificare la frequenza su cui l'\gls{enddev} si aspetta di ricevere i beacon broadcast. \\
+0x13 & \texttt{BeaconFreqAns} & \gls{enddev} & Usato dall'\gls{enddev} per confermare (ACK) il comando \texttt{BeaconFreqReq}. \\
+
+\end{longtable}
+
+\section{Beaconing}
+
+Tutti i \gls{gw}s quindi, oltre a inoltrare i messaggi tra \gls{enddev} e \gls{netser}, devono gestire la loro sincronizzazione temporale tramite l'invio di beacon in certi intervalli prefissati.
+
+Ogni beacon viene trasmesso in un pacchetto radio in implicit mode senza header LoRa e CRC. Il preamble deve contenere 10 simboli non modulati per permettere agli \gls{enddev} di implementare una ricerca beacon a basso consumo. Il frame contiene poi un Payload chiamato BCNPayload che consiste in una parte comune di rete e una parte specifica di \gls{gw}:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/CLASSE B/BCNPayload.png}
+    \caption{Struttura del BCNPayload}
+    \label{fig:esempio16}
+\end{figure}
+
+La parte comune ha:
+\begin{itemize}
+    \item Un \gls{rfu}
+    \item Un campo Time che è una marca temporale in secondi
+    \item Un CRC
+\end{itemize}
+
+La parte specifica provvede invece informazioni aggiuntive sul \gls{gw} che manda il beacon e può essere diversa in ogni \gls{gw}. È  composta da 7 byte, 1 per il campo InfoDesc e 6 per il campo Info. 
+
+
+\begin{longtable}{c p{10cm}}
+\caption{Significato dei valori del campo InfoDesc (parte del BCNPayload).} \label{tab:infodesc_values} \\
+
+\toprule
+\textbf{InfoDesc} & \textbf{Significato} \\
+\midrule
+\endfirsthead
+
+\multicolumn{2}{c}{{\bfseries \tablename\ \thetable{} -- continua dalla pagina precedente}} \\
+\toprule
+\textbf{InfoDesc} & \textbf{Significato} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{2}{r}{{Continua nella pagina successiva...}} \\
+\bottomrule
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+0 & Coordinate GPS della prima antenna del \gls{gw}. \\
+\addlinespace
+1 & Coordinate GPS della seconda antenna del \gls{gw}. \\
+\addlinespace
+2 & Coordinate GPS della terza antenna del \gls{gw}. \\
+\addlinespace
+3--127 & RFU (Riservato per usi futuri). \\
+\addlinespace
+128--255 & Riservato per broadcast specifici di reti personalizzate. \\
+\end{longtable}
+
+
+Se l'\gls{enddev} è fisso, è sufficiente la parte comune di rete per eseguire operazioni di classe B; mentre se è mobile è necessario anche che l'\gls{enddev} demoduli la parte specifica per essere in grado di segnalare eventuali spostamenti.
+
+
+\chapter{Classe C}
+
+Gli \gls{enddev} che implementano la classe C sono usati per applicazioni che hanno sufficiente energia disponibile e non devono minimizzare il tempo di ricezione. Non è possibile inoltre implementare classe B e classe C allo stesso tempo. 
+
+L'obiettivo è quello di ascoltare con i parametri di \gls{rx}2 (\gls{datarate}, frequenza e \gls{spreadingfactor}) il più a lungo e il più spesso possibile, e lo può fare quando non sta inviando o ricevendo su \gls{rx}1. Per fare ciò viene aperta una breve finestra con i parametri di \gls{rx}2 tra la fine della trasmissione \gls{ulk} e l'inizio di \gls{rx}1, e non appena termina \gls{rx}1 si cambia subito ai parametri di \gls{rx}2 che deve rimanere aperta finché l'\gls{enddev} non deve inviare un nuovo messaggio. In questo modo, a differenza della classe A, la \gls{rx}2 rimane aperta molto a lungo ed è possibile ricevere un frame \gls{dlk} in qualsiasi momento.
+Se un messaggio che richiede risposta viene ricevuto da un dispositivo in classe C, questo deve rispondere entro un tempo prestabilito conosciuto sia dall'\gls{enddev} che dal \gls{netser}; nel mentre il \gls{netser} non può inviare ulteriori confirmed message \parencite{LoRaSpec1.0.4, LoRaSpec1.1, Milarokostas2023}.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/ClasseC/ClasseC1.png}
+    \caption{Tempistiche delle \gls{rx} nella classe C }
+    \label{fig:esempio17}
+\end{figure}
+
+Similmente ai dispositivi di classe B, quelli di classe C possono ricevere frame \gls{dlk} Multicast seguendo le stesse regole e limitazioni della classe B 
+
+\section{Comandi \gls{mac}}
+
+Devono essere implementati tutti i comandi \gls{mac} di classe A e in aggiunta:
+
+\begin{longtable}{l l c p{7.5cm}}
+\caption{Comandi MAC specifici per i dispositivi di Classe C.} \label{tab:mac_commands_class_c} \\
+
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endfirsthead
+
+\multicolumn{4}{c}{{\bfseries \tablename\ \thetable{} -- continua dalla pagina precedente}} \\
+\toprule
+\textbf{CID} & \textbf{Comando} & \textbf{Tx da} & \textbf{Descrizione Breve} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{4}{r}{{Continua nella pagina successiva...}} \\
+\bottomrule
+\endfoot
+
+\bottomrule
+\multicolumn{4}{l}{\footnotesize \textit{}}
+\endlastfoot
+
+0x20 & \texttt{DeviceModeInd} & \gls{enddev} & Usato dall'\gls{enddev} per indicare la sua modalità operativa corrente (Classe A o Classe C). \\
+0x20 & \texttt{DeviceModeConf} & \gls{gw} & Usato dalla rete per confermare (ACK) un comando \texttt{DeviceModeInd}. \\
+
+\end{longtable}
+
+
+\chapter{Test}
+
+Nei capitoli precedenti sono stati analizzati i dettagli dell'architettura della \gls{lpwan} LoRa/LoRaWAN e il suo funzionamento. La base però di questa rete risiede nella modulazione LoRa, descritta nel capitolo 2, che si occupa dello scambio di messaggi al livello \gls{phy}.
+
+L'obiettivo di questo capitolo è perciò quello di testare lo scambio di messaggi al livello \gls{phy} tramite modulazione LoRa. Per fare ciò verrà utilizzata una comunicazione \gls{p2p} che ha come vantaggio quello di non implementare una rete LoRa/LoRaWAN completa (quindi con \gls{gw} e \gls{netser}), rendendo possibile così isolare le variabili della modulazione radio (come ad esempio lo \gls{spreadingfactor}) senza l'overhead del protocollo di rete.
+
+I test si focalizzano su:
+
+\begin{itemize}
+    \item Stabilire una comunicazione robusta tra i due dispositivi
+    \item Misurare latenza, \gls{pps}, throughput e loss rate al variare del \gls{datarate} (cambia di conseguenza anche lo \gls{spreadingfactor}), della dimensione del payload e della frequenza
+\end{itemize}
+
+
+\section{Setup}
+
+Questi test verranno condotti tramite una comunicazione \gls{p2p} tra due Raspberry Pi dotati del modulo SX1262 868M LoRa HAT.
+Per il lato software sono stati utilizzati script Python basati sulla libreria sx126x, impostati per operare in modalità Point-to-Point (P2P), al quale ho aggiunto queste funzionalità:
+
+\begin{itemize}
+    \item Logica di ACK
+    \item Counter per i pacchetti arrivati con successo
+    \item Logica di ritrasmissione (se il pacchetto non arriva, il trasmettitore ritenta l'invio fino a 2 volte)
+\end{itemize}
+
+Per valutare l'impatto del Data Rate sulle prestazioni, sono state configurati due diversi \gls{datarate} (o air speed):
+
+\begin{itemize}
+    \item 2400 bps, corrispondente ad uno \gls{spreadingfactor} più alto
+    \item 9600 bps, corrispondente ad uno \gls{spreadingfactor} più basso
+\end{itemize}
+
+Per entrambi i \gls{datarate} sono stati eseguiti test sia a frequenza 433MHz sia a frequenza 868MHz. Sono stati inviati pacchetti di dimensione variabile: 8, 24, 48, 96 e 192 Byte.
+
+
+\section{Loss rate}
+
+Il primo parametro misurato è stato il loss rate, calcolato dividendo il numero totale di pacchetti persi per il numero totale di pacchetti inviati (moltiplicando poi per 100 per ottenere la percentuale). Per simulare delle interferenze, quindi della perdita di pacchetti, è stata introdotta inoltre una probabilità del 30\% di scartare il pacchetto.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/loss_rate_868.png}
+    \caption{Loss rate a frequenza 868MHz}
+    \label{fig:esempio18}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/loss_rate_433.png}
+    \caption{Loss rate a frequenza 433MHz}
+    \label{fig:esempio19}
+\end{figure}
+
+Come possiamo osservare nella figura 7.2, il loss rate è molto più alto quando il \gls{datarate} è 2400 bps e la frequenza è 433MHz. Questo è l'unico caso infatti dove sono avvenute perdite di pacchetti non dovute alla simulazione di interferenze. Nel terzo e nel quinto caso addirittura il pacchetto non è arrivato, nonostante le ritrasmissioni.
+
+Dalla figura 7.1 e 7.2 possiamo osservare che se togliessimo la simulazione di interferenze, il loss rate sarebbe circa dello 0\% (tranne nella situazione descritta precedentemente). Questo dimostra la grande affidabilità della modulazione LoRa.
+
+
+\section{Latenza}
+
+Il secondo parametro misurato è stata la latenza, misurata come \gls{rtt}: cioè il tempo tra l'invio di un pacchetto e la ricezione del relativo ACK.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/lat_868.png}
+    \caption{Latenza a frequenza 868MHz}
+    \label{fig:esempio20}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/lat_433.png}
+    \caption{Latenza a frequenza 433MHz}
+    \label{fig:esempio21}
+\end{figure}
+
+Dalle figure 7.3 e 7.4 possiamo evincere che:
+
+\begin{itemize}
+    \item All'aumentare della dimensione del Payload la latenza aumenta, ma non in maniera significativa (pochi decimi a 2400 bps), quindi probabilmente gran parte della latenza è dovuta ad altri fattori
+    \item Il \gls{datarate} a 9600 bps garantisce una latenza molto inferiore rispetto a 2400 bps, confermando quindi che uno \gls{spreadingfactor} più basso garantisce una maggior velocità di trasmissione
+\end{itemize}
+
+Nella figura 7.4, quando nonostante le ritrasmissioni il pacchetto non è arrivato, la linea è spezzata.
+
+\section{\gls{pps}}
+
+Il terzo parametro misurato è stato il \gls{pps}, calcolato come 1/\gls{rtt}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/pps_868.png}
+    \caption{\gls{pps} a frequenza 868MHz}
+    \label{fig:esempio22}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/pps_433.png}
+    \caption{\gls{pps} a frequenza 433MHz}
+    \label{fig:esempio23}
+\end{figure}
+
+Dalle figure 7.5 e 7.6 deduciamo che rimane praticamente costante, con piccolissime variazioni (tranne a frequenza 433MHz e \gls{datarate} 2400 bps, dove se non sono mai arrivati pacchetti sarà pari a 0).
+
+\section{Throughput}
+
+Il quarto e ultimo parametro misurato è stato il throughput, ovvero la quantità di dati trasmessi in relazione al tempo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/throughput_868.png}
+    \caption{Throughput a frequenza 868MHz}
+    \label{fig:esempio24}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{photo/test/throughput_433.png}
+    \caption{Throughput a frequenza 433MHz}
+    \label{fig:esempio25}
+\end{figure}
+
+Possiamo osservare, quando i pacchetti sono arrivati con successo, che l'aumento nel tempo è lineare per entrambi i \gls{datarate}. Questo, insieme alla misurazione del \gls{rtt} e del \gls{pps}, dimostra che LoRa è una modulazione che dà il massimo della sua efficienza quando bisogna trasmettere pacchetti di grandi dimensioni, visto che aumentando il Payload il \gls{rtt} varia di poco e il throughput aumenta notevolmente.
+
+
+\chapter{Sviluppi futuri e conclusione}
+
+Nonostante il grande impegno mondiale le reti LoRa/LoRaWAN presentano difetti e debolezze e possono essere ulteriormente migliorate
+
+\section{Obiettivi della LoRa Alliance®}
+
+Nel 2024 la LoRa Alliance® ha lanciato una lista ufficiale che evidenzia i principali obiettivi di sviluppo di LoRa/LoRaWAN \parencite{LoRaAllianceRoadmap2024}:
+
+\begin{itemize}
+    \item Espansione in nuovi mercati
+        \begin{itemize}
+            \item Miglioramento della connettività per reti non terrestri
+            \item Sviluppo della funzionalità di relay
+            \item Aggiunta di modalità di scoperta di reti più veloce, offrendo nuove opzioni di distribuzioni dove la copertura non è permanente
+        \end{itemize}
+    \item Iper-scalabilità
+        \begin{itemize}
+            \item Semplificare la distribuzione tramite una gestione del profilo e della migrazione del device
+            \item Trasporto di identificatori GS1 (per esempio codici a barre o RFIDs) tramite LoRa/LoRaWAN
+            \item Scaricamento automatico del profilo di un dispositivo da repositories online utilizzando una API standard
+        \end{itemize}
+    \item Gestione della rete: rafforzare l'interoperabilità dei dispositivi standardizzando il \gls{appser} e le interfacce dei \gls{gw}
+    \item Certificazione
+        \begin{itemize}
+            \item Aggiunta di aggiornamenti firmware \gls{ota} 
+            \item Aggiunta di test avanzati di interoperabilità 
+        \end{itemize}
+    \item Sviluppo del livello \gls{phy}
+\end{itemize}
+
+
+\section{Conclusione}
+
+In questa tesi abbiamo trattato approfonditamente la rete LoRa/LoRaWAN, partendo dal concetto di IoT e dalla modulazione \gls{css} fino ad arrivare ai dettagli dell'architettura di rete. 
+
+Abbiamo evidenziato le qualità di LoRa/LoRaWAN, soffermandoci sui benefici della sua struttura e sulle differenze e sugli utilizzi delle diverse classi di dispositivi che conferiscono flessibilità di utilizzo.
+
+Inoltre tramite i test eseguiti abbiamo confermato l'efficienza e la robustezza della modulazione LoRa, che essendo alla base di LoRa/LoRaWAN le trasmette questi benefici.
+
+
+
+
+\printglossaries
+\addcontentsline{toc}{chapter}{Glossario e Acronimi}
+
+\listoffigures
+\addcontentsline{toc}{chapter}{Immagini}
+
+\printbibliography
+\addcontentsline{toc}{chapter}{Bibliografia}
+
+
+\end{document}
