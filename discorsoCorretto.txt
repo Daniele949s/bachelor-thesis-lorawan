@@ -1,0 +1,104 @@
+				SLIDE 0
+
+Buongiorno a tutti,
+
+Vi presenterò oggi la mia tesi su Architetture LoRa e LoRaWAN: utilizzo e performance
+
+Partiamo con introdurre il concetto di IoT. **Pausa**
+
+				SLIDE 1
+
+L'IoT (Internet of Things) indica un insieme di dispositivi che hanno la capacità fondamentale di poter comunicare dati, ed eventualmente capacità di memorizzarli, acquisirli o elaborarli. 
+
+Grazie a queste abilità è possibile perciò automatizzare processi, monitorare grandezze o anche fornire a oggetti fisici capacità digitali. Trovano perciò largo impiego ad esempio in Smart City, Agricoltura o industria. Esempi di dispositivi sono: Sensori, Attuatori(tipo serrature smart o irrigazione), smartwatch, lampadine smarth, ecc
+
+Data la loro enorme diffusione, unita con il veloce aumento ( alcune previsioni dicono che entro il 2030 avremo 500 miliardi di dispositivi), nasce il problema di come poter interconnettere grandi gruppi di dispositivi con requisiti eterogenei. Dato inoltre che molti operano a batteria, si aggiunge anche il bisogno di minimizzare i consumi energetici di queste connessioni.
+
+				SLIDE 2
+				
+Ci sono due principali approcci per risolvere questo problema:
+
+- Primo: potenziare reti LAN e mobile verso l'inclusione di servizi dedicati all'IoT
+- Secondo: creare reti dedicate al supporto di questi servizi
+
+Possiamo dividere le reti del secondo approccio grazie alla larghezza di banda, e in quelle a piccola larghezza di banda troviamo le LPWAN.
+Le reti LPWAN (Low-Power-Wide-Area-Network) offrono un ottimo compromesso tra un range molto elevato (offrendo quindi una grande copertura) e un basso consumo energetico, ponendosi come una soluzione ottimale per interconnettere un grande numero di dispositivi.
+
+Tra le reti più famose sul mercato troviamo:
+
+- SigFox: Consumo energetico molto basso e device economici, ha però payload ridotti e la rete dipende dall'operatore essendo completamente proprietario
+- RPMA: robustezza al rumore e capacità di supportare molti dispositivi ma consumo energetico maggiore
+- Weightless: standard aperto con più varianti ma diffusione limitata e frammentazione tra le 3 versioni 
+- LoRa/LoRaWAN: la soluzione a spettro non licenziato (aperto a tutti per l'utilizzo) più utilizzata. Tra i vantaggi ricordiamo quello di avere un livello fisico proprietario e quello di essere uno standard aperto (caratteristica che ne favorisce lo sviluppo). Offre una buona portata a bassi consumi ma ha un throughput basso, rischiando congestione in aree densamente popolate
+
+				SLIDE 3
+				
+LoRa/LoRaWAN è quindi l'insieme del livello fisico, dove troviamo LoRa, e del protocollo a livello MAC LoRaWAN. Questa rete utilizza una topologia stella-di-stelle, in cui molti end device comunicano con dei gateway che  a loro volta inoltrano i messaggi a un network server. Gli elementi principali sono 
+- End-device: solitamente sensori o attuatori che comunicano (inviano o ricevono mess) con i GW
+- Gateway: fanno da tramite tra ED e NS 
+- Network Server: componente centrale che amministra gli altri componenti
+- Application Server: software sul server che si occupa della sicurezza (e della costruzione di alcuni Payload)
+- Join Server: software sul server che si occupa della procedura di join, cioè di entrata nella rete, degli ED
+
+
+				SLIDE 4
+				
+Come detto precedentemente, al livello fisico troviamo la modulazione LoRa.
+Questa deriva dalla modulazione CSS (Chirp Spread Spectrum), nella quale i dati vengono codificati in chirp la cui frequenza varia nel tempo e occupa una banda più larga di quella strettamente necessaria (aumentando un pò robustezza sensitività, da cui "a spettro espanso").
+La modulazione CSS, e quindi LoRa, ha due proprietà fondamentali:
+
+- Modificando lo Spreading Factor (parametro che indica quanti simboli possono essere trasmessi) è possibile "scambiare" data rate e range di comunicazione
+
+- Spreading Factor diversi sono ortogonali tra loro, questo permette di mandare più messaggi con SF diversi nello stesso canale nello stesso momento senza che si verifichino interferenze
+
+LoRa si presta particolarmente a una grande diffusione, dato una grande portata, una buona resistenza alla interferenze, i bassi consumi e i costi di produzione hardware abbastanza economici. Nonostante i vantaggi presenta però anche dei difetti:
+
+- Il throughput  è molto basso e con l'aumentare dello SF aumenta anche la latenza
+
+- Con l'aumentare dello SF (quindi meno data rate e range maggiore) diminuisce il throughput (quantità di dati trasmessi in relazione al tempo) e aumenta la latenza, facendo sì che a distanze molto elevate si abbia un throughput molto basso e una latenza molto elevata ( altre cose che influiscono: banda stretta, la modulazione CSS è progettata non per la velocità)
+
+Abbiamo scelto perciò di sperimentare su LoRa per verificare il funzionamento e la qualità della comunicazione in un contesto reale
+
+				SLIDE 5
+			
+I test sono stati svolti effettuando una comunicazione punto-a-punto tra due dispositivi Raspberry Pi dotati di chip LoRa. La scelta di una comunicazione punto-a-punto permette di isolare il livello fisico, quindi la modulazion LoRa, non dovendo implementare tutto il protocollo di rete.
+
+Sono stati effettuati diversi tentativi di comunicazione al variare di frequenza, data rate (spiegare perchè) e dimensione del payload e sono state prese le seguenti misurazioni:
+
+- Latenza
+- Packet per second
+- Throughput
+- Packet Loss Rate
+
+Va specificato che il test è preliminare e limitato, essendo solo tra due dispositivi a distanza ravvicinata. Perciò per esempio il packet loss rate nella maggior parte dei casi risultava nullo. Ho introdotto quindi una probabilità del 30% di scartare il pacchetto per effettuae una simulazione di interferenza.
+
+
+				SLIDE 6
+				
+				
+Possiamo osservare come l'andamento, nella maggioranza dei casi, sia andato in maniera simile. Abbiamo confermato che con un SF più basso il throughput è più alto e la latenza è più bassa (e viceversa), dimostrando quindi che è possibile ottenere un range maggiore a scapito del data rate
+
+La variazione di frequenza, tranne nel caso particolare a 2400 bps, non ha prodotto particolari differenze
+
+
+				SLIDE 7
+				
+Possiamo notare qua invece che a frequenza 433 MHz, con un data rate pari a 2400 bps, il comportamento è diverso. In questo caso sono avvenute anche infatti perdite di pacchetti non per colpa della simulazione di interferenza. E' capitato infatti che il pacchetto, nonostante i 2 tentativi di ritrasmissione, non riuscisse mai ad arrivare a destinazione; generando nel grafico della latenza dei buchi 
+				
+				
+				
+				SLIDE 8
+				
+I test sono stati svolti con un basso numero di dispositivi e ad una distanza molto ravvicinata, rendendoli così abbastanza limitati. Perciò, per rendere il contesto più realistico, si potrebbero svolgere nuovamente i test aumentando i dispositivi e variando le distanze tra di essi. Questo potrebbe far emergere i reali limiti di questa tecnologia (come magari ostacoli, distanze troppo elevate, ecc..) permettendo di fornire una valutazione più precisa
+
+
+Si potrebbe inoltre implementare una rete LoRa/LoRaWAN completa per vedere come l’overhead di rete influisca sui parametri misurati, mostrando il reale impatto del protocollo di rete e il comportamento di LoRa in un contesto più grande
+
+
+
+
+
+
+
+
+

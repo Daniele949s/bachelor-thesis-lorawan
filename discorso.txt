@@ -1,83 +1,84 @@
 Buongiorno a tutti,
 
-Oggi parleremo della rete LoRa/LoRaWAN
+Oggi parleremo della rete LoRa/LoRaWAN, concentrandoci sul livello fisico (quindi sulla modulazione LoRa), mostrando anche dei test eseguiti su questo
 
 Partiamo introducendo cosa è L'IoT (Internet of Things), **pausa**
 L'IoT è un infrastruttura globale per la società dell'informazione, quindi è un insieme di strutture e servizi digitali che rappresenta il punto di incontro tra il mondo fisico e quello virtuale. Permette infatti di interconnettere oggetti fisici o virtuali basandosisulle tecnologie della comnuicazione e dell'informazione già esistenti.
 
-**Eventualmente inserire qua caratteristiche IoT**
 
-
+-------------------------------------------------------------------------------------
+NON DIRE (POCO TEMPO)
 Un oggetto, in ambito IoT, può essere fisico o virtuale e ha come caratteristica fondamentale quella di poter essere identificato e integrato nelle reti di comuicazione. Esempi sono: ambiente circostante, robot industriali, equipaggiamento elettrico, contenuti multimed, app software. Un oggetto fisico può essere anche rappresentato da 1 o più ogg virtuali.
-Un dispositivo è invece un pezzo di equipaggiamento con la capacità fondamentale di comunicare  e eventualmente: rilev, attuazz, acquisiz dati, memorizz dati, elab dati.
+-------------------------------------------------------------------------------------
 
+
+Un dispositivo è invece un pezzo di equipaggiamento con la capacità fondamentale di comunicare  e eventualmente: rilev, attuazz, acquisiz dati, memorizz dati, elab dati
+
+Le caratteristiche principali dell'IoT sono:
+
+
+
+
+`````````````````````````````````````````````````````````````````````````````````````
+NON DIRE INTERAMENTE (solo interconnettività scala di diffusione servizi)
+• Interconnettività: nell’ambito dell’IoT tutto può essere interconnesso grazie all’infrastruttura globale di informazione e comunicazione
+
+• Servizi riferiti agli oggetti: l’IoT ha la capacità di fornire servizi agli oggetti nei limiti degli oggetti stessi. Esempi di servizi sono: protezione della privacy e coerenza semantica tra oggetti fisici e i loro oggetti virtuali associati
+
+• Eterogeneità: i dispositivi sono eterogenei essendo basati su differenti piattaforme hardware e reti. Possono interagire con altri dispositivi o piattaforme di servizi tramite reti diverse.
+
+• Cambiamenti dinamici: lo stato dei dispositivi cambia dinamicamente, per esempio:
+da dormiente ad attivo, connesso o disconnesso o anche luogo o velocità. Anche il
+numero stesso dei dispositivi può cambiare dinamicamente
+
+• Scala di diffusione enorme: Il numero di dispositivi che necessitano di essere gestiti e di comunicare tra loro è almeno di un ordine di grandezza superiore ai dispositivi connessi all’internet corrente. La proporzione di comunicazioni attivate da dispositivi e da umani scorrerà visibilmente verso attivazioni da parte dei dispositivi
+`````````````````````````````````````````````````````````````````````````````````````
+
+-------------------------------------------------------------------------------------
+NON DIRE (POCO TEMPO)
 I dispositivi collezionano diversi tipi di info che forniscono alle reti di info e com (DISTINGUERE), possono anche eseguire operazioni su dati ricevuti da queste reti.
 La comunicazione avviene in 3 modi o in maniera ibrida tra essi:
 1. Tramite reti di com e un GW
 2. Tramite reti di com no GW
 3. Diretta tra dispositivi
+-------------------------------------------------------------------------------------
 
 
-Lo sviluppo dell'IoT è tra gli attuali obiettivi nel mondo, stime recenti (Fare cit)
- prevedono che entro fine 2030 ci saranno circa 500 miliardi di dispositivi. Uno degli obiettivi
- principali è quindi quello di riuscire ad interconnetterli in grande numero tra loro per supportare nuove
- applicazioni con requisiti eterogenei. Questo obiettivo è stato descritto dalla IMT-2020 come
- uno dei 3 scenari più esigenti dell'era del 5G.
- Per riuscire a interconnettere tutti questi dispositivi quindi è necessario potenziare le
- reti di comunicazione, sono stati perciò sviluppati due approcci prncipali: evoluzione reti mobile e reti LAN verso 
- inclusione di servizi di comunicazione IoT e aumento delle reti dedicate al supporto di questi servizi.
- Nel secondo approccio possiamo fare una distinzione basata sulla larghezza di banda:
+`````````````````````````````````````````````````````````````````````````````````````
+Riassumere!!!(Poco tempo)
+
+Lo sviluppo dell'IoT è tra gli attuali obiettivi nel mondo, stime recenti (Fare cit) prevedono che entro fine 2030 ci saranno circa 500 miliardi di dispositivi. Uno degli obiettivi principali è quindi quello di riuscire ad interconnetterli in grande numero per supportare nuove applicazioni con requisiti eterogenei. Questo obiettivo è stato descritto dalla IMT-2020 come uno dei 3 scenari più esigenti dell'era del 5G. Per riuscire a interconnettere tutti questi dispositivi quindi è necessario potenziare le reti di comunicazione, sono stati perciò sviluppati due approcci prncipali: evoluzione reti mobile e reti LAN verso inclusione di servizi di comunicazione IoT e aumento delle reti dedicate al supporto di questi servizi. Nel secondo approccio possiamo fare una distinzione basata sulla larghezza di banda:
 
  - Banda Larga: tipo LTE e GSM, utilizzate soprattutto per grandi trasf di dati, o per streaming di video/audio
  - Media Banda: WiFi o ZigBEE soprattutto per smart home
  - Banda piccola: Troviamo qui la maggior parte delle LPWAN (Low Power Wide Area), utilizzo soprattutto per monitoraggio di sensori,
  misurazione remote, agricoltura ecc
+ 
+ `````````````````````````````````````````````````````````````````````````````````````
 
- Parliamo nel particolare delle LPWAN:
- Rappresentano un ottimo compromesso tra basso consunmo, range elevato e basso data rate.
- Generalmente una LPWAN è una rete dove vengono distribuiti dei GWs che operano come punti d'accesso
- per supportare degli ED che operano come sensori o attuatori.
+Parliamo nel particolare delle LPWAN:
+Rappresentano un ottimo compromesso tra basso consunmo, range elevato e basso data rate. Generalmente in questa tipologia di rete vengono distribuiti dei GWs che operano come punti d'accesso per supportare degli ED che operano come sensori o attuatori.
 
- Tra le più famose LPWAN sul mercato troviamo:
+Tra le più famose LPWAN sul mercato troviamo:
  RPMA - Weightless (3) - SigFox
 
- LoRa-LoRaWAN: è la soluzione più diffusa per LPWAN su spettro non licenziato.
- Ha un livello phy proprietario ed è uno standard aperto
+LoRa-LoRaWAN: è la soluzione più diffusa per LPWAN su spettro non licenziato.
+Tra le qualità principali ci sono: un livello phy proprietario e il fatto che è uno standard aperto
 
 
- LoRa: LoRa è una tecnologia di moduazione che si basa su quella CSS, è implementata in oltre 410 milioni
- di ED e supporta più del 30% delle connessioni LPWAN nel mondo.
- E' quindi una tecnologia di modulazione a spettro espanso di proprietà della Semtech che permete comunicazioni 
- a lungo raggio, richiede una bassissima richiesta di energia che permette ad alcuni disp di durare fino a 10 anni.
- La modulazione CSS sacrifica data rate per sensitività, il data rate è scambiabile con portata o potenza variando lo spreading factor ortogonale
+Questa rete è caratterizzata da una topologia Star-of-stars,
 
 
-Nella modulazione CSS i dati puri vengono codificati e si genera così un segnale chiamato "chirp" che varia in frequenza e ha una larghezza di banda maggiore
-rispetto a quella del segnale originale (Dati puri). 
-
-Le proprietà principali di LoRa sono:
-
-- Larghezza di banda scalabile: larghezza di banda e frequenza sono scalabili, per adattare LoRa ad applicazioni sia a banda stretta che a banda Larga
-- Alta Robustezza
-- Resistenza a multipath e fading 
-- Resistenza all'effetto doppler
-- Capacità a lungo raggio
-- Ottima capacità di rete : sfruttando SF ortogonali, più segnali espansi possono essere trasmessi contemporaneamente sullo stesso canale
-
-
-LoRa/LoRaWAN
-
-Mentre LoRa risiede nel livello fisico, nel livello MAC troviamo LoRaWAN ( che definisce quindi .....)
-
-Solo insieme formano un'implementazione di una LPWAN: LoRa/LoRaWAN o più semplicemente LoRaWAN
-
-Questa rete è caratterizzata da una topologia Star-of-stars, quindi uno star network di più star network.
-Uno star network è un tipo di topologia di rete dove tutti i dispositivi sono connessi ad un hub o ad uno switch centrale, in 
-una topologia star-of-stars più star network sono connessi a uno star network centrale.
-
+-------------------------------------------------------------------------------------
+NON DIRE (POCO TEMPO)
+quindi uno star network di più star network. Uno star network è un tipo di topologia di rete dove tutti i dispositivi sono connessi ad un hub o ad uno switch centrale, in  una topologia star-of-stars più star network sono connessi a uno star network centrale.
 Questo è ideale per le reti pubbliche: un server centrale che mitiga i problemi di collisione è costoso e complesso, quindi non ideale per reti private
+-------------------------------------------------------------------------------------
 
 
+
+`````````````````````````````````````````````````````````````````````````````````````
+Riassumere!!!(Poco tempo) --> dire quasi solo i nomi
 I componenti della rete sono:
 
 - ED: sensori o attuatori che sia mandano messaggi wireless a dei GWs con modula-
@@ -92,42 +93,267 @@ anche downlink payload
 - JS: software sul server che tratta le richieste di join degli ED
 
 - NS: amministra tutti gli altri componenti nella rete svolgendo diversi compiti
+`````````````````````````````````````````````````````````````````````````````````````
 
-Una caratteristica di LoRa/LoRaWAN è il LoRaWAN relay: un ED standard che entra in funzione quando ED e GW non riescono a comunicare direttamente facendo da "tramite",
-può esevire fino a 16 ED. Sostanzialmente quando un ED non riesce a comunicare direttamente con un GW e quindi con il NS,
-invia un frame WOR; se il relay lo nota si attiva e aspetta di ricevere un frame dall'ED, una volta ricevuto ci aggiunge un campo e lo inoltra al GW.
 
+LoRa: LoRa è una tecnologia di moduazione che si basa su quella CSS. 
+-------------------------------------------------------------------------------------
+NON DIRE(poco tempo)
+è implementata in oltre 410 milioni di ED e supporta più del 30% delle connessioni LPWAN nel mondo.
+-------------------------------------------------------------------------------------
+E' quindi una tecnologia di modulazione a spettro espanso di proprietà della Semtech che permete comunicazioni a lungo raggio, richiede una bassissima richiesta di energia che permette ad alcuni disp di durare fino a 10 anni.
+
+
+Nella modulazione CSS i dati puri vengono codificati e si genera così un segnale chiamato "chirp" che varia in frequenza e ha una larghezza di banda maggiore
+rispetto a quella del segnale originale (Dati puri). La modulazione CSS sacrifica data rate per sensitività, il data rate è scambiabile con portata o potenza variando lo spreading factor ortogonale
+
+Spreading Factor: Parametro che indica quanti simboli diversi possono essere trasmessi. Ortogonali: prodotto interno nullo, non interferiscono tra loro
+Le proprietà principali di LoRa sono:
+
+
+`````````````````````````````````````````````````````````````````````````````````````
+NON DIRE INTERAMENTE (solo interconnettività scala di diffusione servizi)
+- Larghezza di banda scalabile: larghezza di banda e frequenza sono scalabili, per adattare LoRa ad applicazioni sia a banda stretta che a banda Larga
+- Alta Robustezza
+- Resistenza a multipath e fading 
+- Resistenza all'effetto doppler
+- Capacità a lungo raggio
+- Ottima capacità di rete : sfruttando SF ortogonali, più segnali espansi possono essere trasmessi contemporaneamente sullo stesso canale
+`````````````````````````````````````````````````````````````````````````````````````
+
+Mentre LoRa risiede nel livello fisico, nel livello MAC troviamo LoRaWAN, che si occupa di implementare 
+
+Solo insieme formano un'implementazione di una LPWAN: LoRa/LoRaWAN o più semplicemente LoRaWAN
+
+
+
+-------------------------------------------------------------------------------------
+NON DIRE (POCO TEMPO)
+Una caratteristica di LoRa/LoRaWAN è il LoRaWAN relay: un ED standard che entra in funzione quando ED e GW non riescono a comunicare direttamente facendo da "tramite", può esevire fino a 16 ED. Sostanzialmente quando un ED non riesce a comunicare direttamente con un GW e quindi con il NS, invia un frame WOR; se il relay lo nota si attiva e aspetta di ricevere un frame dall'ED, una volta ricevuto ci aggiunge un campo e lo inoltra al GW.
+-------------------------------------------------------------------------------------
 
 Ogni ED può essere di 3 classi
 
-- A: Gli ED di questa classe sono quelli che richiedono il minor consumo energetico. Devono permettere comnuicazioni bi-direzionali dove ogni trasmissione
+- A: Gli ED di questa classe sono quelli che richiedono il minor consumo energetico.
+Devono permettere comnuicazioni bi-direzionali dove ogni trasmissione
 ulk è seguita da 2 brevi RX dove e possibile ricevere comunicazioni dlk
 
-- B: Gli ED di questa classe permettono, rispetto a quelli di classe A, una comunicazione maggiore con il NS. Questo può
-infatti decidere di inviare frame dlk senza aver prima ricevuto un frame ulk. Questo avviene tramite una sincronizzazione attuata grazie
-a un frame chiamato beacon che permette all'ED di sapere esattamente quando mettersi in ascolto
+- B: Gli ED di questa classe permettono, rispetto a quelli di classe A, una comunicazione maggiore con il NS.
+-------------------------------------------------------------------------------------
+NON DIRE(POCO TEMPO)
+Questo può infatti decidere di inviare frame dlk senza aver prima ricevuto un frame ulk. Questo avviene tramite una sincronizzazione attuata grazie a un frame chiamato beacon che permette all'ED di sapere esattamente quando mettersi in ascolto
+-------------------------------------------------------------------------------------
 
-- C: Gli ED che implementano questa classe sono in attesa continua di messaggi dlk, quindi il NS può decidere di trasmettere in ogni momento.
-E' la classe che richiede il maggior consumo energetico.
+- C: Gli ED che implementano questa classe sono in attesa continua di messaggi dlk, quindi il NS può decidere di trasmettere in ogni momento. E' la classe che richiede il maggior consumo energetico.
 
 
 
 TEST:
 
-Come precedentemente detto, la base di LoRa/LoRaWAN risiede nella tecnologia di modulazione LoRa che si occupa dello scambio di messaggi a livello fisico. Per questo motivo sono stati condotti dei test consistenti in una comunicazione point-to-point tra due raspberry pi dotati di chip lora. Questa scelta di setup permette di testare direttamente la comunicazione tramite LoRa senza dover implementare una rete LoRa/LoRaWAN completa, permettendo così di isolare le variabili della modulazione radio senza l'overhead introdotto da un protocollo di rete.
+Come precedentemente detto, la base di LoRa/LoRaWAN risiede nella tecnologia di modulazione LoRa che si occupa dello scambio di messaggi a livello fisico. Per questo motivo sono stati condotti dei test per valutare il funzionamento e la qualità della comnuicazinoe tramite LoRa in un contesto reale. Il test consiste in una comunicazione point-to-point tra due raspberry pi dotati di chip lora. Questa scelta di setup permette di testare direttamente la comunicazione tramite LoRa senza dover implementare una rete LoRa/LoRaWAN completa, permettendo così di isolare le variabili della modulazione radio senza l'overhead introdotto da un protocollo di rete.
 
 Sono state prese diverse misurazioni volte a determinare la qualità della comunicazione.
 Come possiamo vedere i parametri presi sono: Loss rate, Latenza misurata in RTT, Packet per second e throughput
 
 
-***************
+*************** Qua parlo dei test
 
 
 Da queste misurazioni possiamo concludere che la modulazione LoRa è robusta e sicura, adatta a sostenere un vasto utilizzo per comunicazioni a lungo raggio e a basso consumo, riconfermando la posizione che ricopre nelle reti LPWAN mondiali.
 
-Migliorare conslusione test..
 
 
 
+
+
+
+VERSIONE 2
+
+
+Buongiorno a tutti.
+Oggi presenterò una panoramica sulla rete LoRa/LoRaWAN, concentrandomi in particolare sul livello fisico, quindi sulla modulazione LoRa, e mostrando i test sperimentali che ho svolto.
+
+Inizio introducendo brevemente il contesto.
+L’Internet of Things è un’infrastruttura globale che permette di interconnettere oggetti fisici e virtuali sfruttando tecnologie di comunicazione già esistenti. La crescita dell’IoT è estremamente rapida: le stime indicano che entro il 2030 ci saranno centinaia di miliardi di dispositivi connessi. Una delle sfide principali è quindi riuscire a interconnetterli in grande numero, con requisiti eterogenei e consumo energetico minimo.
+
+Per rispondere a queste esigenze sono state sviluppate tecnologie di comunicazione a bassa potenza e lungo raggio, le LPWAN.
+Rappresentano un compromesso tra basso consumo, grande raggio e data rate ridotto. Tra le principali soluzioni ci sono RPMA, Weightless, SigFox e soprattutto LoRa/LoRaWAN, che è oggi la più diffusa su spettro non licenziato.
+
+LoRaWAN utilizza una topologia star-of-stars in cui molti end device comunicano con gateway che inoltrano i messaggi a un network server. Gli elementi principali sono: gli end device, i gateway, il network server e i server applicativi e di join.
+Non entro nei dettagli di ciascun componente per motivi di tempo, ma è importante notare che la rete si basa sulla combinazione del livello fisico LoRa e del livello MAC LoRaWAN.
+
+Passo quindi al cuore del sistema: la modulazione LoRa.
+LoRa è una modulazione a spettro espanso sviluppata da Semtech e derivata dalla Chirp Spread Spectrum. I dati vengono codificati in chirp la cui frequenza varia nel tempo e occupa una banda più larga del necessario: questo aumenta la robustezza e la sensitività.
+
+Due proprietà sono fondamentali:
+
+Lo spreading factor, che determina il numero di simboli trasmissibili e permette di scambiare data rate con raggio di comunicazione.
+
+L’ortogonalità tra spreading factor diversi: segnali con SF differenti possono coesistere sullo stesso canale senza interferire.
+
+LoRaWAN opera sopra LoRa e definisce le modalità di accesso al mezzo e tre classi di dispositivi: A, B e C. Per semplicità ricordo solo che tutti implementano la classe A, quella a minor consumo, mentre le classi B e C aumentano la possibilità di ricezione al prezzo di un consumo maggiore.
+
+Dopo aver definito il contesto teorico, passo alla parte sperimentale del lavoro.
+L’obiettivo è stato valutare la qualità dello scambio di messaggi tramite la modulazione LoRa in un contesto reale.
+Per farlo ho scelto un setup point-to-point tra due Raspberry Pi dotati di transceiver LoRa.
+Questa scelta elimina l’overhead introdotto da LoRaWAN e permette di isolare il comportamento del livello fisico.
+
+Le metriche misurate sono state:
+– packet loss rate,
+– latenza in RTT,
+– packet per second
+– e throughput.
+
+Ho variato i parametri principali della comunicazione LoRa, cioè lo spreading factor, la frequenza di lavoro e la dimensione del payload.
+
+Dalle misurazioni emerge che la modulazione LoRa è molto robusta. In quasi tutti i test il packet loss è nullo; la latenza cresce come previsto all’aumentare dello spreading factor; e il throughput diminuisce di conseguenza.
+È stato registrato un solo caso di perdita significativa: questo conferma che la scelta dei parametri radio è essenziale per garantire una comunicazione stabile.
+
+In conclusione, la sperimentazione mostra che LoRa è una soluzione affidabile per scenari IoT caratterizzati da lungo raggio e basso consumo. I risultati confermano il comportamento teorico della modulazione e mostrano come sia fondamentale scegliere correttamente i parametri fisici per ottimizzare prestazioni e affidabilità.
+
+
+
+
+Appunti:
+
+Troppo lungo --> eliminare alcuni concetti
+
+Nel titolo - sessione -relatore - corel
+
+L'IoT parla solamente dei dispositivi --> correggere la definizione. Cercare di far emergere di più la storia (anticipare tematica energetica)
+Definizione-SpiegazioneDiCosaPermette-CosaPermettono-DoveApplicati-Caratteristiche (anche difetti tipo prob energ)
+
+
+3 slide di background
+
+Dire vantaggi su IoT di LPWAN, aumentare comparazione
+
+2 slide:
+- Desc topologica (aggiungere di cosa sto parlando e diamo di nuovo una definizione)
+- Perchè abbiamo sperimentato su LoRa, cosa permette, cosa comporta
+
+Sui test dire che è stato uno studio preliminare- test limitato- 
+
+Slide 4 spiegazione problematiche reti LoRa e spiegare un oò modulazione, nono c'è controllo a livello di rete
+
+
+Scrivere perchè lo ho fatto
+
+mettere ultimo slide packet loss
+altri un paio di grafici per dimostrare
+
+
+Negli sviluppi futuri emergano caratteristiche reti e dire sviluppi veri, tio provare sperimentazione con multipli device 
+Creare supporti che eliminino il packet loss
+
+
+Slide conclusiva 
+GRAZIE PER L?ATTENZIONE
+
+
+
+Allargare testo
+
+
+
+Discorso 3 (Corretto)
+				SLIDE 0
+
+Buongiorno a tutti,
+
+Vi presenterò oggi la mia tesi su Architetture LoRa e LoRaWAN: utilizzo e performance
+
+Partiamo con introdurre il concetto di IoT. **Pausa**
+
+				SLIDE 1
+
+L'IoT (Internet of Things) indica un insieme di dispositivi che hanno la capacità fondamentale di poter comunicare dati, ed eventualmente capacità di memorizzarli, acquisirli o elaborarli. 
+
+Grazie a queste abilità è possibile perciò automatizzare processi, monitorare grandezze o anche fornire a oggetti fisici capacità digitali. Trovano perciò largo impiego ad esempio in Smart City, Agricoltura o industria. Esempi di dispositivi sono: Sensori, Attuatori(tipo serrature smart o irrigazione), smartwatch, lampadine smarth, ecc
+
+Data la loro enorme diffusione, unita con il veloce aumento ( alcune previsioni dicono che entro il 2030 avremo 500 miliardi di dispositivi), nasce il problema di come poter interconnettere grandi gruppi di dispositivi con requisiti eterogenei. Dato inoltre che molti operano a batteria, si aggiunge anche il bisogno di minimizzare i consumi energetici di queste connessioni.
+
+				SLIDE 2
+				
+Ci sono due principali approcci per risolvere questo problema:
+
+- Primo: potenziare reti LAN e mobile verso l'inclusione di servizi dedicati all'IoT
+- Secondo: creare reti dedicate al supporto di questi servizi
+
+Possiamo dividere le reti del secondo approccio grazie alla larghezza di banda, e in quelle a piccola larghezza di banda troviamo le LPWAN.
+Le reti LPWAN (Low-Power-Wide-Area-Network) offrono un ottimo compromesso tra un range molto elevato (offrendo quindi una grande copertura) e un basso consumo energetico, ponendosi come una soluzione ottimale per interconnettere un grande numero di dispositivi.
+
+Tra le reti più famose sul mercato troviamo:
+
+- SigFox: Consumo energetico molto basso e device economici, ha però payload ridotti e la rete dipende dall'operatore essendo completamente proprietario
+- RPMA: robustezza al rumore e capacità di supportare molti dispositivi ma consumo energetico maggiore
+- Weightless: standard aperto con più varianti ma diffusione limitata e frammentazione tra le 3 versioni 
+- LoRa/LoRaWAN: la soluzione a spettro non licenziato (aperto a tutti per l'utilizzo) più utilizzata. Tra i vantaggi ricordiamo quello di avere un livello fisico proprietario e quello di essere uno standard aperto (caratteristica che ne favorisce lo sviluppo). Offre una buona portata a bassi consumi ma ha un throughput basso, rischiando congestione in aree densamente popolate
+
+				SLIDE 3
+				
+LoRa/LoRaWAN è quindi l'insieme del livello fisico, dove troviamo LoRa, e del protocollo a livello MAC LoRaWAN. Questa rete utilizza una topologia stella-di-stelle, in cui molti end device comunicano con dei gateway che  a loro volta inoltrano i messaggi a un network server. Gli elementi principali sono 
+- End-device: solitamente sensori o attuatori che comunicano (inviano o ricevono mess) con i GW
+- Gateway: fanno da tramite tra ED e NS 
+- Network Server: componente centrale che amministra gli altri componenti
+- Application Server: software sul server che si occupa della sicurezza (e della costruzione di alcuni Payload)
+- Join Server: software sul server che si occupa della procedura di join, cioè di entrata nella rete, degli ED
+
+
+				SLIDE 4
+				
+Come detto precedentemente, al livello fisico troviamo la modulazione LoRa.
+Questa deriva dalla modulazione CSS (Chirp Spread Spectrum), nella quale i dati vengono codificati in chirp la cui frequenza varia nel tempo e occupa una banda più larga di quella strettamente necessaria (aumentando un pò robustezza sensitività, da cui "a spettro espanso").
+La modulazione CSS, e quindi LoRa, ha due proprietà fondamentali:
+
+- Modificando lo Spreading Factor (parametro che indica quanti simboli possono essere trasmessi) è possibile "scambiare" data rate e range di comunicazione
+
+- Spreading Factor diversi sono ortogonali tra loro, questo permette di mandare più messaggi con SF diversi nello stesso canale nello stesso momento senza che si verifichino interferenze
+
+LoRa si presta particolarmente a una grande diffusione, dato una grande portata, una buona resistenza alla interferenze, i bassi consumi e i costi di produzione hardware abbastanza economici. Nonostante i vantaggi presenta però anche dei difetti:
+
+- Il throughput  è molto basso e con l'aumentare dello SF aumenta anche la latenza
+
+- Con l'aumentare dello SF (quindi meno data rate e range maggiore) diminuisce il throughput (quantità di dati trasmessi in relazione al tempo) e aumenta la latenza, facendo sì che a distanze molto elevate si abbia un throughput molto basso e una latenza molto elevata ( altre cose che influiscono: banda stretta, la modulazione CSS è progettata non per la velocità)
+
+Abbiamo scelto perciò di sperimentare su LoRa per verificare il funzionamento e la qualità della comunicazione in un contesto reale
+
+				SLIDE 5
+			
+I test sono stati svolti effettuando una comunicazione punto-a-punto tra due dispositivi Raspberry Pi dotati di chip LoRa. La scelta di una comunicazione punto-a-punto permette di isolare il livello fisico, quindi la modulazion LoRa, non dovendo implementare tutto il protocollo di rete.
+
+Sono stati effettuati diversi tentativi di comunicazione al variare di frequenza, data rate (spiegare perchè) e dimensione del payload e sono state prese le seguenti misurazioni:
+
+- Latenza
+- Packet per second
+- Throughput
+- Packet Loss Rate
+
+Va specificato che il test è preliminare e limitato, essendo solo tra due dispositivi a distanza ravvicinata. Perciò per esempio il packet loss rate nella maggior parte dei casi risultava nullo. Ho introdotto quindi una probabilità del 30% di scartare il pacchetto per effettuae una simulazione di interferenza.
+
+
+				SLIDE 6
+				
+				
+Possiamo osservare come l'andamento, nella maggioranza dei casi, sia andato in maniera simile. Abbiamo confermato che con un SF più basso il throughput è più alto e la latenza è più bassa (e viceversa), dimostrando quindi che è possibile ottenere un range maggiore a scapito del data rate
+
+La variazione di frequenza, tranne nel caso particolare a 2400 bps, non ha prodotto particolari differenze
+
+
+				SLIDE 7
+				
+Possiamo notare qua invece che a frequenza 433 MHz, con un data rate pari a 2400 bps, il comportamento è diverso. In questo caso sono avvenute anche infatti perdite di pacchetti non per colpa della simulazione di interferenza. E' capitato infatti che il pacchetto, nonostante i 2 tentativi di ritrasmissione, non riuscisse mai ad arrivare a destinazione; generando nel grafico della latenza dei buchi 
+				
+				
+				
+				SLIDE 8
+				
+				
+
+
+
+In futuro si potrebbero eseguire dei test più precisi, magari aumentando il numero di dispositivi e provando a variare la distanza per verificare meglio il comportamento
+
+Si potrebbe possibilmente anche implementare una rete LoRa/LoRaWAN completa e vedere come l'overhead di rete influisca su throughput e latenza
 
 
